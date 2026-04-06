@@ -2,7 +2,7 @@
    IMPORTS
    ============================================================ */
 @import "tw-animate-css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/inter";
 @import "shadcn/tailwind.css";
 
 /* ============================================================
@@ -22,14 +22,14 @@
     --radius: 0.625rem;
 
     /* --- Typography --- */
-    --font-sans: "Geist Variable", sans-serif;
-
+  --font-sans: "Inter Variable", sans-serif;
+  
     /* --- Base --- */
     --background:         oklch(0.145 0 0);
     --foreground:         oklch(0.985 0 0);
 
     /* --- Surface --- */
-    --card:               oklch(0.205 0 0);
+    --card:               oklch(100% 0.00011 271.152);
     --card-foreground:    oklch(0.985 0 0);
     --popover:            oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
@@ -87,11 +87,16 @@
 }
 
 /* ============================================================
-   SIDEBAR OVERRIDES
+   GLOBAL OVERRIDES
    Defined outside @layer to win specificity over shadcn tokens.
    ============================================================ */
+body {
+  background-color: oklch(22.17% 0.0107 229.49);
+  color: oklch(0.985 0 0);
+}
+
 [data-slot="sidebar-inner"] {
-  background-color: #202B2F;
+  background-color: #202B2F !important;
   color: #fff;
 }
 
@@ -107,4 +112,8 @@
 
 [data-slot="sidebar-container"] {
   border: none;
+}
+
+[data-slot="card"] {
+  background-color: #1A2731;
 }
