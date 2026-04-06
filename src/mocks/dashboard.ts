@@ -7,7 +7,7 @@ export const statCards: StatCard[] = [
     value: 15, 
     change: "+20.1% Em relação ao mês passado", 
     icon: Search,
-    className: "bg-gradient-to-br from-[#144F74] to-[#06314C]" // ← só no primeiro
+    className: "bg-gradient-to-br from-[#144F74] to-[#06314C]" // ← só no primeiro card do dashboard
   },
   { title: "PRs Aprovados",    value: 10, change: "+20% Em relação ao mês passado",   icon: Check    },
   { title: "PRs Reprovados",   value: 5,  change: "+17% Em relação ao mês passado",   icon: Minus    },
