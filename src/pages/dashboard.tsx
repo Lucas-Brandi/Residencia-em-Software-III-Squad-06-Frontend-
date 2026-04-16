@@ -1,20 +1,32 @@
+import * as React from "react"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { StatCard } from "@/components/ui/stat-card"
 import { statCards } from "@/mocks/dashboard"
 import { PrChart } from "@/components/ui/pr-chart"
 import { RecentPRs } from "@/components/layout/recent-prs"
+import type { DateRange } from "react-day-picker"
+import { DateRangePicker } from "@/components/layout/date-range-picker"
 
 export default function Dashboard() {
-  return (
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: new Date(2026, 0, 20),
+    to: new Date(2026, 1, 9),
+  })
+    return (
     <SidebarProvider>
       <AppSidebar activePath="/dashboard" />
 
       <SidebarInset>
         <main className="p-6 space-y-6">
-          <div className="flex items-center gap-3">
-            <SidebarTrigger />
-            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger />
+              <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            </div>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
           </div>
 
           {/* Stat Cards */}
@@ -29,6 +41,7 @@ export default function Dashboard() {
             <PrChart />
             <RecentPRs />
           </div>
+
         </main>
       </SidebarInset>
     </SidebarProvider>

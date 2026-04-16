@@ -1,4 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
 import { recentPRs } from "@/mocks/dashboard"
 
 const statusStyles = {
@@ -28,9 +36,36 @@ export function RecentPRs() {
                   <p className="text-xs text-muted-foreground mt-0.5">{pr.author}</p>
                 </div>
               </div>
-              <span className={`text-xs font-medium ${statusStyles[pr.status]}`}>
-                {pr.status}
-              </span>
+
+              <div className="flex items-center gap-3">
+                <span className={`text-xs font-medium ${statusStyles[pr.status]}`}>
+                  {pr.status}
+                </span>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10"
+                    >
+                      <MoreHorizontal size={14} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    style={{ backgroundColor: "#1A2731" }}
+                    className="border-border"
+                  >
+                    <DropdownMenuItem
+                      className="cursor-pointer text-sm"
+                      onClick={() => alert(`Navegação para PR #${pr.id} ainda não implementada`)}
+                    >
+                      Ver PR #{pr.id}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </li>
           ))}
         </ul>
