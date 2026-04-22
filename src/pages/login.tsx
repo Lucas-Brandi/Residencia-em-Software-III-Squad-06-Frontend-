@@ -71,7 +71,7 @@ export function Login() {
               />
               Lembre-se de mim.
             </label>
-            <Link to="/esqueceu-senha" className="hover:text-white transition-colors underline decoration-gray-500/50 underline-offset-2">
+            <Link to="/recuperarSenha" className="hover:text-white transition-colors underline decoration-gray-500/50 underline-offset-2">
               Esqueceu a senha?
             </Link>
           </div>
