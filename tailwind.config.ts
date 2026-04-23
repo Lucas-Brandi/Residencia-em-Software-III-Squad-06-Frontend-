@@ -8,6 +8,7 @@ export default {
   ],
   theme: {
     extend: {
+      
       colors: {
         border: "var(--border)",
         input: "var(--input)",
