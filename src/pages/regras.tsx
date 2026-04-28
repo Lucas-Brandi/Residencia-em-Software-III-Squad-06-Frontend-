@@ -31,7 +31,7 @@ export function Regras() {
             <SidebarTrigger />
             <div>
               <h1 className="text-2xl font-semibold text-foreground">
-                Regras do Repositório
+                Regras
               </h1>
               <p className="text-sm text-muted-foreground">
                 Defina e gerencie os critérios de avaliação de Pull Requests.
