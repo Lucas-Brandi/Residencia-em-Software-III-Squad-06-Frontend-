@@ -7,6 +7,8 @@ import { Perfil } from '@/pages/perfil';
 import { Login } from '@/pages/login';
 import { Register } from '@/pages/cadastro'; 
 import { ForgotPassword } from '@/pages/recuperarSenha'; 
+import PRAnalysis from '@/pages/pr-analysis';
+
 
 function App() {
   return (
@@ -20,6 +22,7 @@ function App() {
       <Route path="/regras" element={<Regras />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/perfil" element={<Perfil />} />
+      <Route path="/pr/:id" element={<PRAnalysis />} />
     </Routes>
   );
 }

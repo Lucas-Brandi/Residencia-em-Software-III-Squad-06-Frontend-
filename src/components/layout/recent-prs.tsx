@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal } from "lucide-react"
 import { recentPRs } from "@/mocks/dashboard"
+import { useNavigate } from "react-router-dom"
 
 const statusStyles = {
   "Em análise": "text-yellow-400",
@@ -16,6 +17,7 @@ const statusStyles = {
 }
 
 export function RecentPRs() {
+  const navigate = useNavigate()
   return (
     <Card className="border-border" style={{ backgroundColor: "#1A2731" }}>
       <CardHeader>
@@ -59,7 +61,7 @@ export function RecentPRs() {
                   >
                     <DropdownMenuItem
                       className="cursor-pointer text-sm"
-                      onClick={() => alert(`Navegação para PR #${pr.id} ainda não implementada`)}
+                      onClick={() => navigate(`/pr/${pr.id}`)}
                     >
                       Ver PR #{pr.id}
                     </DropdownMenuItem>
