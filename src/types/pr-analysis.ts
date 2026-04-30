@@ -19,3 +19,9 @@ export interface Finding {
   title: string
   description: string
 }
+
+export interface TimelineEvent {
+  id: number
+  label: string
+  time: string
+}

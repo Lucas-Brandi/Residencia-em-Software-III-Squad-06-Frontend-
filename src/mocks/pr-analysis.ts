@@ -48,3 +48,10 @@ export const findings: Finding[] = [
     description: "O método handleLogin faz validação, autenticação e logging ao mesmo tempo. Separe em funções distintas.",
   },
 ]
+
+export const timeline: TimelineEvent[] = [
+  { id: 1, label: "PR #142 aberto",          time: "11:05 AM" },
+  { id: 2, label: "Análise da IA Iniciada",   time: "11:06 AM" },
+  { id: 3, label: "Análise Concluída",        time: "11:08 AM" },
+  { id: 4, label: "Status: Aguardando Revisão Humana", time: "" },
+]
