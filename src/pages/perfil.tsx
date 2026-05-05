@@ -1,104 +1,118 @@
-import { UserCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import * as React from 'react'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/layout/app-sidebar'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { UserCircle } from 'lucide-react'
+
+// Virá do contexto de autenticação quando a API estiver pronta
+const mockUser = {
+  name: 'Olivia Silva',
+  githubUsername: 'iancacarregosa',
+  birthdate: '1998-04-12',
+  language: 'pt-BR',
+}
 
 export function Perfil() {
+  const [avatarError, setAvatarError] = React.useState(false)
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{
-        background:
-          'linear-gradient(135deg, #0a1628 0%, #0d2340 40%, #0f2d4a 70%, #0a1628 100%)',
-      }}
-    >
-      {/* Decorative light streaks */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
+    <SidebarProvider>
+      <AppSidebar activePath="/perfil" />
 
-      <div className="relative z-10 w-full max-w-2xl mx-auto px-6">
-        <Card
-          className="p-8 rounded-2xl"
-          style={{ backgroundColor: 'oklch(0.22 0.02 220)' }}
-        >
-          {/* App name */}
-          <div className="text-center mb-6">
-            <div className="text-xs tracking-widest uppercase text-muted-foreground mb-4">
-              STARIAN
-            </div>
-            <h1 className="text-2xl font-semibold text-foreground mb-2">
-              Account
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Update your account settings. Set your preferred language and
-              timezone.
-            </p>
+      <SidebarInset>
+        <div className="relative min-h-screen flex flex-col">
+
+          {/* Trigger fixo no topo */}
+          <div className="absolute top-6 left-6 z-10">
+            <SidebarTrigger />
           </div>
 
-          {/* Horizontal rule */}
-          <div className="border-t border-border mb-6" />
+          {/* Blobs decorativos */}
+          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
-              <form className="space-y-6">
-                {/* Nome field */}
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Nome
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Seu nome"
-                    className="w-full"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Esse será o nome usado no perfil e nos e-mails.
-                  </p>
+          {/* Conteúdo centralizado */}
+          <div className="flex-1 flex items-center justify-center px-6 py-20">
+            <Card className="w-full max-w-2xl border-border" style={{ backgroundColor: '#1A2731' }}>
+
+              <CardHeader className="pb-4 border-b border-border text-center">
+                <CardTitle className="text-lg font-semibold">Minha Conta</CardTitle>
+                <CardDescription>
+                  Atualize seus dados pessoais e preferências.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-8">
+
+                  {/* Formulário */}
+                  <form className="flex-1 space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-foreground">Nome</label>
+                      <Input type="text" defaultValue={mockUser.name} placeholder="Seu nome" />
+                      <p className="text-xs text-muted-foreground">
+                        Esse será o nome usado no perfil e nos e-mails.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-foreground">Data de nascimento</label>
+                      <Input type="date" defaultValue={mockUser.birthdate} />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-foreground">Idioma</label>
+                      <select
+                        defaultValue={mockUser.language}
+                        className="w-full h-10 rounded-md border border-border px-3 text-sm text-foreground outline-none"
+                        style={{ backgroundColor: '#0f1c26' }}
+                      >
+                        <option value="">Selecione o idioma</option>
+                        <option value="pt-BR">Português (Brasil)</option>
+                        <option value="en-US">English (US)</option>
+                        <option value="es">Español</option>
+                      </select>
+                      <p className="text-xs text-muted-foreground">
+                        Esse será o idioma usado no dashboard.
+                      </p>
+                    </div>
+
+                    <Button className="w-full" style={{ backgroundColor: '#39505B', color: '#FFFFFF' }}>
+                      Salvar alterações
+                    </Button>
+                  </form>
+
+                  {/* Avatar do GitHub */}
+                  <div className="flex flex-col items-center gap-2 pt-1">
+                    {!avatarError ? (
+                      <img
+                        src={`https://github.com/${mockUser.githubUsername}.png?size=96`}
+                        alt={mockUser.name}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-border"
+                        onError={() => setAvatarError(true)}
+                      />
+                    ) : (
+                      <div
+                        className="w-20 h-20 rounded-full border-2 border-border flex items-center justify-center"
+                        style={{ backgroundColor: '#0f1c26' }}
+                      >
+                        <UserCircle size={48} className="text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      @{mockUser.githubUsername}
+                    </span>
+                  </div>
+
                 </div>
-
-                {/* Data de nascimento field */}
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Data de nascimento
-                  </label>
-                  <Input type="date" className="w-full" />
-                </div>
-
-                {/* Idioma field */}
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
-                    Idioma
-                  </label>
-                  <select className="w-full h-10 rounded border border-border bg-background px-3 text-sm">
-                    <option>Selecione o idioma</option>
-                    <option>pt-BR</option>
-                    <option>en-US</option>
-                    <option>es</option>
-                  </select>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Esse será o idioma usado no dashboard.
-                  </p>
-                </div>
-
-                {/* Submit button */}
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full rounded-xl"
-                >
-                  Editar
-                </Button>
-              </form>
-            </div>
-
-            {/* Avatar placeholder */}
-            <div className="ml-8">
-              <UserCircle size={72} className="text-muted-foreground" />
-            </div>
+              </CardContent>
+            </Card>
           </div>
-        </Card>
-      </div>
-    </div>
-  );
+
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
