@@ -7,9 +7,11 @@ import { Regra } from '@/types/rules';
 
 interface RulesTableProps {
   regras: Regra[];
+  onEdit?: (regra: Regra) => void;
+  onDelete?: (regraId: string) => void;
 }
 
-export function RulesTable({ regras }: RulesTableProps) {
+export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
   return (
     <Card>
       <div className="overflow-x-auto">
@@ -83,10 +85,18 @@ export function RulesTable({ regras }: RulesTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon-xs">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onEdit?.(regra)}
+                    >
                       <Pencil className="h-3 w-3" />
                     </Button>
-                    <Button variant="ghost" size="icon-xs">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onDelete?.(regra.id)}
+                    >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
