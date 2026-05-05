@@ -1,4 +1,4 @@
-import type { PRAnalysis, Finding  } from "@/types/pr-analysis"
+import type { PRAnalysis, Finding, TimelineEvent  } from "@/types/pr-analysis"
 
 export const prAnalysisMock: PRAnalysis = {
   id: 24,
