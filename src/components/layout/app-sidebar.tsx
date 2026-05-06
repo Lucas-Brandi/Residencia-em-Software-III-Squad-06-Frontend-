@@ -7,7 +7,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
   GitPullRequest,
@@ -15,29 +15,31 @@ import {
   Settings,
   UserCircle,
   X,
-} from "lucide-react"
+} from 'lucide-react';
+
+// Mock user role - in real app, this would come from auth context
+const currentUserRole = 'admin'; // Change to 'dev' or 'reviewer' to test hiding
 
 const navItems = [
-  { title: "Dashboard",     href: "/dashboard",  icon: LayoutDashboard },
-  { title: "Pull Requests", href: "/prs",         icon: GitPullRequest  },
-  { title: "Regras",        href: "/regras",      icon: ListChecks      },
-  { title: "Administração", href: "/admin",       icon: Settings        },
-]
+  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
+  { title: 'Regras', href: '/regras', icon: ListChecks },
+  ...(currentUserRole === 'admin'
+    ? [{ title: 'Administração', href: '/admin', icon: Settings }]
+    : []),
+];
 
 interface AppSidebarProps {
-  activePath?: string
+  activePath?: string;
 }
 
-export function AppSidebar({ activePath = "/dashboard" }: AppSidebarProps) {
-  const { toggleSidebar } = useSidebar()
+export function AppSidebar({ activePath = '/dashboard' }: AppSidebarProps) {
+  const { toggleSidebar } = useSidebar();
 
   return (
     <Sidebar collapsible="offcanvas" className="border-none">
-
       <SidebarHeader className="flex flex-row items-center justify-between px-5 py-5">
-        <span className="text-base font-semibold tracking-wide">
-          DiffyAI
-        </span>
+        <span className="text-base font-semibold tracking-wide">DiffyAI</span>
         <button
           onClick={toggleSidebar}
           className="text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors"
@@ -73,7 +75,7 @@ export function AppSidebar({ activePath = "/dashboard" }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              isActive={activePath === "/perfil"}
+              isActive={activePath === '/perfil'}
               className="gap-3 h-11 px-3 rounded-lg text-sm font-medium
                 text-sidebar-foreground/60
                 hover:text-sidebar-foreground hover:bg-sidebar-accent
@@ -87,7 +89,6 @@ export function AppSidebar({ activePath = "/dashboard" }: AppSidebarProps) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-
     </Sidebar>
-  )
+  );
 }
