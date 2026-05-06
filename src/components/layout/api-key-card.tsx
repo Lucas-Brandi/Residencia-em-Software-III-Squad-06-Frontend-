@@ -19,12 +19,21 @@ export function ApiKeyCard() {
               type="password"
               value="**** **** **** 4hA1"
               readOnly
-              className="flex-1"
+              className="flex-1 bg-white text-black border-gray-200 pr-12"
+              style={{ WebkitTextFillColor: 'black' }}
             />
-            <Button variant="outline" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-white text-black hover:bg-gray-100"
+            >
               Visualizar
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-white text-black hover:bg-gray-100"
+            >
               Regenerar
             </Button>
           </div>
@@ -42,10 +51,13 @@ export function ApiKeyCard() {
         </div>
 
         <div className="flex items-center gap-2 pt-4">
-          <Button variant="secondary" className="flex-1">
+          <Button
+            variant="default"
+            className="flex-1 bg-white text-black hover:bg-gray-100 rounded-lg max-w-xs"
+          >
             Salvar alterações
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button variant="outline" className="flex-1 rounded-lg max-w-xs">
             Restaurar padrões
           </Button>
         </div>

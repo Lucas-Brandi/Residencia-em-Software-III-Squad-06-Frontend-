@@ -1,17 +1,46 @@
 import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { RoleBadge } from '@/components/ui/role-badge';
 import { StatusUsuarioBadge } from '@/components/ui/status-usuario-badge';
 import { UsuarioAdmin } from '@/types/admin';
 
 interface UsersTableProps {
   usuarios: UsuarioAdmin[];
+  onEdit?: (usuario: UsuarioAdmin) => void;
+  onDelete?: (usuarioId: string) => void;
+  searchTerm?: string;
+  onSearchChange?: (value: string) => void;
+  onInviteUser?: () => void;
 }
 
-export function UsersTable({ usuarios }: UsersTableProps) {
+export function UsersTable({
+  usuarios,
+  onEdit,
+  onDelete,
+  searchTerm,
+  onSearchChange,
+  onInviteUser,
+}: UsersTableProps) {
   return (
     <Card>
+      {/* Search and Invite User Controls */}
+      <div className="flex items-center justify-between p-6 border-b border-border">
+        <Input
+          placeholder="Pesquisar"
+          className="w-64 h-9 bg-background border-border"
+          value={searchTerm || ''}
+          onChange={(e) => onSearchChange?.(e.target.value)}
+        />
+        <Button
+          onClick={onInviteUser}
+          className="h-9 px-4 bg-primary hover:bg-primary/90 rounded-lg font-medium"
+        >
+          + Convidar Novo Usuário
+        </Button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -83,10 +112,18 @@ export function UsersTable({ usuarios }: UsersTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon-xs">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onEdit?.(usuario)}
+                    >
                       <Pencil className="h-3 w-3" />
                     </Button>
-                    <Button variant="ghost" size="icon-xs">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => onDelete?.(usuario.id)}
+                    >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>

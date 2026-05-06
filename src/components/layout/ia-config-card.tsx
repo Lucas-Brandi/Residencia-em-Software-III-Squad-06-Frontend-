@@ -12,10 +12,8 @@ export function IaConfigCard() {
           <label className="text-sm font-medium text-foreground mb-2 block">
             Modelo de IA Principal
           </label>
-          <select className="w-full h-10 rounded border border-border bg-background px-3 text-sm">
-            <option>GPT-4</option>
-            <option>Claude 3.5 Sonnet</option>
-            <option>Custom</option>
+          <select className="w-full h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm text-black">
+            <option>Gemini</option>
           </select>
         </div>
 
@@ -29,7 +27,11 @@ export function IaConfigCard() {
               min="0"
               max="100"
               defaultValue="50"
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer"
+              style={{
+                background:
+                  'linear-gradient(to right, #3b82f6 0%, #3b82f6 50%, #ffffff 50%, #ffffff 100%)',
+              }}
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Suave</span>

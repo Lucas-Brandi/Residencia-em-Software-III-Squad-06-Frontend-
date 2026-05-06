@@ -38,6 +38,7 @@ export function Modal({
           'relative z-50 w-full max-w-lg mx-4 bg-card border border-border rounded-lg shadow-lg',
           className,
         )}
+        style={{ backgroundColor: '#31424D' }}
       >
         {/* Header */}
         {(title || description) && (
