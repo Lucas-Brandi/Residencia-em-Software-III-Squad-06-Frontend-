@@ -10,7 +10,7 @@ import { UserCircle } from 'lucide-react'
 const mockUser = {
   name: 'Olivia Silva',
   githubUsername: 'iancacarregosa',
-  birthdate: '1998-04-12',
+  birthdate: '2006-02-18',
   language: 'pt-BR',
 }
 

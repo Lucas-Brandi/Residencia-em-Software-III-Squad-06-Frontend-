@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -21,6 +21,8 @@ export function Admin() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | undefined>();
   const [editingUser, setEditingUser] = useState<UsuarioAdmin | undefined>();
+
+  const editingUserRef = useRef<UsuarioAdmin | undefined>(undefined);
 
   const filteredUsuarios = usuarios.filter((usuario) =>
     usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -46,18 +48,19 @@ export function Admin() {
     email: string;
     role: RoleUsuario;
   }) => {
-    if (editingUser) {
-      // Edit existing user - immutable update
+    const currentEditing = editingUserRef.current;
+
+    if (currentEditing) {
       setUsuarios((prev) =>
         prev.map((usuario) =>
-          usuario.id === editingUser.id
+          usuario.id === currentEditing.id
             ? { ...usuario, nome: userData.nome, role: userData.role }
             : usuario,
         ),
       );
+      editingUserRef.current = undefined;
       setEditingUser(undefined);
     } else {
-      // Create new user - immutable update
       const newId = `#${usuarios.length + 1}`;
       const newUser: UsuarioAdmin = {
         id: newId,
@@ -85,6 +88,7 @@ export function Admin() {
   };
 
   const openEditModal = (usuario: UsuarioAdmin) => {
+    editingUserRef.current = usuario;
     setEditingUser(usuario);
     setIsInviteModalOpen(true);
   };
@@ -144,6 +148,7 @@ export function Admin() {
       <InviteUserModal
         isOpen={isInviteModalOpen}
         onClose={() => {
+          editingUserRef.current = undefined;
           setIsInviteModalOpen(false);
           setEditingUser(undefined);
         }}

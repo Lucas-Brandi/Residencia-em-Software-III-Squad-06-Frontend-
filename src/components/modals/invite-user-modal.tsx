@@ -39,9 +39,8 @@ function InviteUserContent({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nome.trim() || !formData.email.trim()) {
-      return;
-    }
+    if (!formData.nome.trim()) return;
+    if (!editingUser && !formData.email.trim()) return; // ← email só obrigatório ao convidar
 
     onSubmit(formData);
     onClose();
