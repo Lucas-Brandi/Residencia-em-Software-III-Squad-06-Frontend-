@@ -4,7 +4,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar'
 import { StatCard } from '@/components/ui/stat-card'
 import { PrChart } from '@/components/ui/pr-chart'
 import { RecentPRs } from '@/components/layout/recent-prs'
-import { DateRangePicker } from '@/components/ui/date-range-picker'
+import { DateRangePicker } from '@/components/layout/date-range-picker'
 import { statCards } from '@/mocks/dashboard'
 import { pullRequestsService } from '@/services/pull-requests'
 import type { PullRequest } from '@/types/pull-request'
@@ -34,7 +34,6 @@ export default function Dashboard() {
       <SidebarInset>
         <main className="p-6 space-y-6">
 
-          {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
