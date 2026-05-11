@@ -1,8 +1,22 @@
-export type PRStatus = 'Aprovado' | 'Reprovado' | 'Em análise' | 'Aprovado com alertas'
+export type PRStatusApi = 'aberto' | 'fechado' | 'mergeado'
 
 export interface PullRequest {
   id: string
-  title: string
-  author: string
-  status: PRStatus
+  repositoryId: string
+  prNumber: number
+  authorId: number
+  title: string | null
+  githubUrl: string | null
+  status: PRStatusApi
 }
+
+export interface CreatePullRequestDto {
+  repositoryId: string
+  prNumber: number
+  authorId: number
+  status: PRStatusApi
+  title?: string
+  githubUrl?: string
+}
+
+export interface UpdatePullRequestDto extends Partial<CreatePullRequestDto> {}
