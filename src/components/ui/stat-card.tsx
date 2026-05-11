@@ -8,6 +8,7 @@ interface StatCardProps {
   value: number
   change: string
   icon: LucideIcon
+  className?: string
 }
 
 export function StatCard({ title, value, change, icon: Icon, className }: StatCardProps) {

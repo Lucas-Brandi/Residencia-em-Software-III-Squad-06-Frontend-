@@ -8,7 +8,7 @@
 /* ============================================================
    TAILWIND DIRECTIVES
    ============================================================ */
-@tailwind base;
+@tailwind base; 
 @tailwind components;
 @tailwind utilities;
 
@@ -22,17 +22,17 @@
     --radius: 0.625rem;
 
     /* --- Typography --- */
-  --font-sans: "Inter Variable", sans-serif;
-  
+    --font-sans: "Inter Variable", sans-serif;
+
     /* --- Base --- */
-    --background:         oklch(0.145 0 0);
-    --foreground:         oklch(0.985 0 0);
+    --background:         oklch(22.17% 0.0107 229.49);
+    --foreground:         oklch(1 0 0);
 
     /* --- Surface --- */
-    --card:               oklch(100% 0.00011 271.152);
-    --card-foreground:    oklch(0.985 0 0);
+    --card:               oklch(26.55% 0.026 242.01);
+    --card-foreground:    oklch(1 0 0);
     --popover:            oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
+    --popover-foreground: oklch(1 0 0);
 
     /* --- Brand --- */
     --primary:            oklch(0.922 0 0);
@@ -40,9 +40,9 @@
 
     /* --- Neutral --- */
     --secondary:            oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted:                oklch(0.269 0 0);
-    --muted-foreground:     oklch(0.708 0 0);
+    --secondary-foreground: oklch(1 0 0);
+    --muted:                oklch(24.63% 0.042 241.64);
+    --muted-foreground:     oklch(87.302% 0.0001 271.152);
     --accent:               oklch(0.269 0 0);
     --accent-foreground:    oklch(0.985 0 0);
 
@@ -52,7 +52,7 @@
     /* --- Form --- */
     --border: oklch(1 0 0 / 10%);
     --input:  oklch(1 0 0 / 15%);
-    --ring:   oklch(0.556 0 0);
+    --ring:   oklch(0.556 0 0 / 50%);
 
     /* --- Charts --- */
     --chart-1: oklch(0.809 0.105 251.813);
@@ -62,19 +62,19 @@
     --chart-5: oklch(0.424 0.199 265.638);
 
     /* --- Sidebar --- */
-    --sidebar:                  oklch(0.22 0.02 220);
-    --sidebar-foreground:       oklch(0.92 0 0);
-    --sidebar-primary:          oklch(0.28 0.025 220);
+    --sidebar:                    #202B2F;
+    --sidebar-foreground:         #fff;
+    --sidebar-primary:            #2C404D;
     --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent:           oklch(0.26 0.03 230);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border:           oklch(1 0 0 / 6%);
-    --sidebar-ring:             oklch(0.55 0.18 260);
+    --sidebar-accent:             #2C404D;
+    --sidebar-accent-foreground:  #ffffff;
+    --sidebar-border:             transparent;
+    --sidebar-ring:               oklch(0.55 0.18 260);
   }
 
   /* --- Global resets --- */
   * {
-    @apply border-border outline-ring/50;
+    @apply outline-ring;
   }
 
   html {
@@ -84,36 +84,4 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-/* ============================================================
-   GLOBAL OVERRIDES
-   Defined outside @layer to win specificity over shadcn tokens.
-   ============================================================ */
-body {
-  background-color: oklch(22.17% 0.0107 229.49);
-  color: oklch(0.985 0 0);
-}
-
-[data-slot="sidebar-inner"] {
-  background-color: #202B2F !important;
-  color: #fff;
-}
-
-[data-sidebar="menu-button"] {
-  color: rgba(232, 234, 237, 0.6);
-}
-
-[data-sidebar="menu-button"]:hover,
-[data-sidebar="menu-button"][data-active="true"] {
-  background-color: #2C404D;
-  color: #ffffff;
-}
-
-[data-slot="sidebar-container"] {
-  border: none;
-}
-
-[data-slot="card"] {
-  background-color: #1A2731;
 }
