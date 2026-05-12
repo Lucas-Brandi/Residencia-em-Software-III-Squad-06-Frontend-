@@ -1,22 +1,22 @@
-export type PRStatusApi = 'aberto' | 'fechado' | 'mergeado'
+export type PRStatusApi = 'aberto' | 'fechado' | 'mergeado';
 
 export interface PullRequest {
-  id: string
-  repositoryId: string
-  prNumber: number
-  authorId: number
-  title: string | null
-  githubUrl: string | null
-  status: PRStatusApi
+  id: string;
+  repositoryId: string;
+  prNumber: number;
+  authorId: number;
+  title: string | null;
+  githubUrl: string | null;
+  status: PRStatusApi;
 }
 
 export interface CreatePullRequestDto {
-  repositoryId: string
-  prNumber: number
-  authorId: number
-  status: PRStatusApi
-  title?: string
-  githubUrl?: string
+  repositoryId: string;
+  prNumber: number;
+  authorId: number;
+  status: PRStatusApi;
+  title?: string;
+  githubUrl?: string;
 }
 
-export interface UpdatePullRequestDto extends Partial<CreatePullRequestDto> {}
+export type UpdatePullRequestDto = Partial<CreatePullRequestDto>;

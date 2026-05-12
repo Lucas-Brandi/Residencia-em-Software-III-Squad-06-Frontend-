@@ -1,21 +1,26 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StatCardProps {
-  title: string
-  value: number
-  change: string
-  icon: LucideIcon
-  className?: string
+  title: string;
+  value: number;
+  change: string;
+  icon: LucideIcon;
+  className?: string;
 }
 
-export function StatCard({ title, value, change, icon: Icon, className }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  change,
+  icon: Icon,
+  className,
+}: StatCardProps) {
   return (
-    <Card 
-      className={cn("border-border", className)} 
-      style={!className ? { backgroundColor: "#1A2731" } : undefined}
+    <Card
+      className={cn('border-border', className)}
+      style={!className ? { backgroundColor: '#1A2731' } : undefined}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -28,5 +33,5 @@ export function StatCard({ title, value, change, icon: Icon, className }: StatCa
         <p className="text-xs text-muted-foreground mt-1">{change}</p>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,12 +1,16 @@
-import * as React from 'react'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/layout/app-sidebar'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { PRTable } from '@/components/ui/pr-table'
-import { mockPullRequests } from '@/mocks/pull-requests'
+import * as React from 'react';
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { PRTable } from '@/components/ui/pr-table';
+import { mockPullRequests } from '@/mocks/pull-requests';
 
 export default function PullRequests() {
   return (
@@ -15,12 +19,15 @@ export default function PullRequests() {
 
       <SidebarInset>
         <main className="p-6 space-y-6">
-
           <div className="flex items-center gap-3">
             <SidebarTrigger />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Pull Requests</h1>
-              <p className="text-sm text-muted-foreground">Veja todos os pull requests salvos</p>
+              <h1 className="text-2xl font-bold text-foreground">
+                Pull Requests
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Veja todos os pull requests salvos
+              </p>
             </div>
           </div>
 
@@ -45,16 +52,17 @@ export default function PullRequests() {
                 <Button variant="outline" size="icon-xs">
                   <ChevronLeft size={14} strokeWidth={1.5} />
                 </Button>
-                <span className="px-3 py-1 text-sm text-muted-foreground">Página 1 de 10</span>
+                <span className="px-3 py-1 text-sm text-muted-foreground">
+                  Página 1 de 10
+                </span>
                 <Button variant="outline" size="icon-xs">
                   <ChevronRight size={14} strokeWidth={1.5} />
                 </Button>
               </div>
             </div>
           </div>
-
         </main>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

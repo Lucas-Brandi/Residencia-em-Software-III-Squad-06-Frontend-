@@ -17,17 +17,7 @@ import {
   X,
 } from 'lucide-react';
 
-// Mock user role - in real app, this would come from auth context
-const currentUserRole = 'admin'; // Change to 'dev' or 'reviewer' to test hiding
-
-const navItems = [
-  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
-  { title: 'Regras', href: '/regras', icon: ListChecks },
-  ...(currentUserRole === 'admin'
-    ? [{ title: 'Administração', href: '/admin', icon: Settings }]
-    : []),
-];
+import { useAuth } from '@/hooks/use-auth';
 
 interface AppSidebarProps {
   activePath?: string;
@@ -35,6 +25,20 @@ interface AppSidebarProps {
 
 export function AppSidebar({ activePath = '/dashboard' }: AppSidebarProps) {
   const { toggleSidebar } = useSidebar();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
+  // NOTA DE SEGURANÇA: Esconder o link na UI não é suficiente.
+  // O componente de Rota (ex: <Route path="/admin">) também deve verificar a role
+  // e redirecionar o usuário (ex: para /dashboard) se ele não for admin.
+  const navItems = [
+    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
+    { title: 'Regras', href: '/regras', icon: ListChecks },
+    ...(isAdmin
+      ? [{ title: 'Administração', href: '/admin', icon: Settings }]
+      : []),
+  ];
 
   return (
     <Sidebar collapsible="offcanvas" className="border-none">

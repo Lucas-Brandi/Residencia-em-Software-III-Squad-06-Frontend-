@@ -5,10 +5,9 @@ import { Regras } from '@/pages/regras';
 import { Admin } from '@/pages/admin';
 import { Perfil } from '@/pages/perfil';
 import { Login } from '@/pages/login';
-import { Register } from '@/pages/cadastro'; 
-import { ForgotPassword } from '@/pages/recuperarSenha'; 
+import { Register } from '@/pages/cadastro';
+import { ForgotPassword } from '@/pages/recuperarSenha';
 import PRAnalysis from '@/pages/pr-analysis';
-
 
 function App() {
   return (

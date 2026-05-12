@@ -1,21 +1,21 @@
-import { useNavigate } from 'react-router-dom'
-import { MoreHorizontal } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { StatusBadge } from '@/components/ui/status-badge'
+import { useNavigate } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import type { PullRequest } from '@/types/pull-request'
+} from '@/components/ui/dropdown-menu';
+import type { PullRequest } from '@/types/pull-request';
 
 interface PRTableProps {
-  pullRequests: PullRequest[]
+  pullRequests: PullRequest[];
 }
 
 export function PRTable({ pullRequests }: PRTableProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="overflow-x-auto">
@@ -38,9 +38,7 @@ export function PRTable({ pullRequests }: PRTableProps) {
               <td className="px-6 py-4 text-sm font-medium text-foreground">
                 #{pr.id}
               </td>
-              <td className="px-6 py-4 text-sm text-foreground">
-                {pr.title}
-              </td>
+              <td className="px-6 py-4 text-sm text-foreground">{pr.title}</td>
               <td className="px-6 py-4 text-sm text-muted-foreground">
                 {pr.author}
               </td>
@@ -73,5 +71,5 @@ export function PRTable({ pullRequests }: PRTableProps) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }

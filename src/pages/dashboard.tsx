@@ -1,31 +1,36 @@
-import * as React from 'react'
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/layout/app-sidebar'
-import { StatCard } from '@/components/ui/stat-card'
-import { PrChart } from '@/components/ui/pr-chart'
-import { RecentPRs } from '@/components/layout/recent-prs'
-import { DateRangePicker } from '@/components/layout/date-range-picker'
-import { statCards } from '@/mocks/dashboard'
-import { pullRequestsService } from '@/services/pull-requests'
-import type { PullRequest } from '@/types/pull-request'
-import type { DateRange } from 'react-day-picker'
+import * as React from 'react';
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { StatCard } from '@/components/ui/stat-card';
+import { PrChart } from '@/components/ui/pr-chart';
+import { RecentPRs } from '@/components/layout/recent-prs';
+import { DateRangePicker } from '@/components/layout/date-range-picker';
+import { statCards } from '@/mocks/dashboard';
+import { pullRequestsService } from '@/services/pull-requests';
+import type { PullRequest } from '@/types/pull-request';
+import type { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: new Date(2026, 0, 20),
     to: new Date(2026, 1, 9),
-  })
+  });
 
-  const [prs, setPrs] = React.useState<PullRequest[]>([])
-  const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
+  const [prs, setPrs] = React.useState<PullRequest[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    pullRequestsService.getAll()
+    pullRequestsService
+      .getAll()
       .then(setPrs)
       .catch(() => setError('Erro ao carregar pull requests'))
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <SidebarProvider>
@@ -33,7 +38,6 @@ export default function Dashboard() {
 
       <SidebarInset>
         <main className="p-6 space-y-6">
-
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
@@ -64,13 +68,10 @@ export default function Dashboard() {
                 {error}
               </div>
             )}
-            {!loading && !error && (
-              <RecentPRs prs={prs} />
-            )}
+            {!loading && !error && <RecentPRs prs={prs} />}
           </div>
-
         </main>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

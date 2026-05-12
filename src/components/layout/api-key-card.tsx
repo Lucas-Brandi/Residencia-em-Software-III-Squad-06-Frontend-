@@ -6,9 +6,26 @@ import { Input } from '@/components/ui/input';
 
 export function ApiKeyCard() {
   const [showApiKey, setShowApiKey] = useState(false);
+  const [apiKey, setApiKey] = useState('AIzaSyB-exemplo-chave-valida-4hA1');
+  const [autoBlock, setAutoBlock] = useState(false);
 
   const toggleApiKeyVisibility = () => {
     setShowApiKey(!showApiKey);
+  };
+
+  const handleRegenerar = () => {
+    // Placeholder para chamada à API
+    setApiKey('AIzaSyB-nova-chave-' + Math.floor(Math.random() * 1000));
+  };
+
+  const handleSalvar = () => {
+    // Placeholder para salvar alterações
+    console.log('Alterações salvas', { autoBlock });
+  };
+
+  const handleRestaurar = () => {
+    // Placeholder para restaurar padrões
+    setAutoBlock(false);
   };
 
   return (
@@ -26,7 +43,7 @@ export function ApiKeyCard() {
             <div className="relative flex-1">
               <Input
                 type={showApiKey ? 'text' : 'password'}
-                value="**** **** **** 4hA1"
+                value={apiKey}
                 readOnly
                 className="w-full bg-white text-black border-gray-200 pr-10"
                 style={{ WebkitTextFillColor: 'black' }}
@@ -46,13 +63,15 @@ export function ApiKeyCard() {
             <Button
               variant="default"
               size="sm"
+              onClick={toggleApiKeyVisibility}
               className="bg-white text-black hover:bg-gray-100"
             >
-              Visualizar
+              {showApiKey ? 'Ocultar' : 'Visualizar'}
             </Button>
             <Button
               variant="default"
               size="sm"
+              onClick={handleRegenerar}
               className="bg-white text-black hover:bg-gray-100"
             >
               Regenerar
@@ -64,6 +83,8 @@ export function ApiKeyCard() {
           <input
             type="checkbox"
             id="auto-block"
+            checked={autoBlock}
+            onChange={(e) => setAutoBlock(e.target.checked)}
             className="rounded border-border bg-background text-primary focus:ring-primary"
           />
           <label htmlFor="auto-block" className="text-sm text-muted-foreground">
@@ -74,11 +95,16 @@ export function ApiKeyCard() {
         <div className="flex items-center gap-2 pt-4">
           <Button
             variant="default"
+            onClick={handleSalvar}
             className="flex-1 bg-white text-black hover:bg-gray-100 rounded-lg max-w-xs"
           >
             Salvar alterações
           </Button>
-          <Button variant="outline" className="flex-1 rounded-lg max-w-xs">
+          <Button
+            variant="outline"
+            onClick={handleRestaurar}
+            className="flex-1 rounded-lg max-w-xs"
+          >
             Restaurar padrões
           </Button>
         </div>
