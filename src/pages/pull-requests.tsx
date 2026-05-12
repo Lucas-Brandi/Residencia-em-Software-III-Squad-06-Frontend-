@@ -6,9 +6,28 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PRTable } from '@/components/ui/pr-table'
-import { mockPullRequests } from '@/mocks/pull-requests'
+import { pullRequestsService } from '@/services/pull-requests'
+import type { PullRequest } from '@/types/pull-request'
+
+const PAGE_SIZES = [10, 25, 50, 100]
 
 export default function PullRequests() {
+  const [prs, setPrs] = React.useState<PullRequest[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const [page, setPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(10)
+
+  React.useEffect(() => {
+    pullRequestsService.getAll()
+      .then(setPrs)
+      .catch(() => setError('Erro ao carregar pull requests'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const totalPages = Math.max(1, Math.ceil(prs.length / pageSize))
+  const paginated = prs.slice((page - 1) * pageSize, page * pageSize)
+
   return (
     <SidebarProvider>
       <AppSidebar activePath="/prs" />
@@ -29,24 +48,49 @@ export default function PullRequests() {
           </div>
 
           <Card className="overflow-hidden">
-            <PRTable pullRequests={mockPullRequests} />
+            {loading && (
+              <p className="text-sm text-muted-foreground p-6 text-center">Carregando...</p>
+            )}
+            {error && (
+              <p className="text-sm text-red-400 p-6 text-center">{error}</p>
+            )}
+            {!loading && !error && (
+              <PRTable pullRequests={paginated} />
+            )}
           </Card>
 
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">0 de 100 linhas</p>
+            <p className="text-sm text-muted-foreground">
+              {prs.length} resultado{prs.length !== 1 ? 's' : ''}
+            </p>
             <div className="flex items-center gap-4">
-              <select className="h-8 rounded-lg border border-input bg-background px-2.5 py-1 text-sm text-foreground outline-none">
-                <option value="10">10 linhas por página</option>
-                <option value="25">25 linhas por página</option>
-                <option value="50">50 linhas por página</option>
-                <option value="100">100 linhas por página</option>
+              <select
+                value={pageSize}
+                onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
+                className="h-8 rounded-lg border border-input bg-background px-2.5 py-1 text-sm text-foreground outline-none"
+              >
+                {PAGE_SIZES.map((s) => (
+                  <option key={s} value={s}>{s} linhas por página</option>
+                ))}
               </select>
               <div className="flex items-center gap-1">
-                <Button variant="outline" size="icon-xs">
+                <Button
+                  variant="outline"
+                  size="icon-xs"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
                   <ChevronLeft size={14} strokeWidth={1.5} />
                 </Button>
-                <span className="px-3 py-1 text-sm text-muted-foreground">Página 1 de 10</span>
-                <Button variant="outline" size="icon-xs">
+                <span className="px-3 py-1 text-sm text-muted-foreground">
+                  Página {page} de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon-xs"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
                   <ChevronRight size={14} strokeWidth={1.5} />
                 </Button>
               </div>
