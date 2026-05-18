@@ -1,11 +1,18 @@
-const BASE = import.meta.env.VITE_API_URL
+const BASE = import.meta.env.VITE_API_URL;
 
 export async function http<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('token');
+
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...options,
-  })
-  if (!res.ok) throw new Error(`${res.status}`)
-  const json = await res.json()
-  return json.data
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
+  });
+
+  if (!res.ok) throw new Error(`${res.status}`);
+  const json = await res.json();
+  return json.data;
 }
