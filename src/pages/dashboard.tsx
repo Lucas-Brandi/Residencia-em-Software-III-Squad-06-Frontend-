@@ -15,10 +15,14 @@ import type { PullRequest } from '@/types/pull-request';
 import type { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: new Date(2026, 0, 20),
-    to: new Date(2026, 1, 9),
-  });
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+    () => {
+      const to = new Date();
+      const from = new Date();
+      from.setDate(from.getDate() - 6);
+      return { from, to };
+    },
+  );
 
   const [prs, setPrs] = React.useState<PullRequest[]>([]);
   const [loading, setLoading] = React.useState(true);
