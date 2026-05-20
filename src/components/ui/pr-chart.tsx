@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
-import { pullRequestsService } from '@/services/pull-requests';
+import type { PullRequest } from '@/types/pull-request';
 import type { DateRange } from 'react-day-picker';
 
 const chartConfig = { prs: { label: 'PRs', color: '#3b82f6' } };
@@ -36,19 +36,11 @@ function buildDays(prs: { openedAt: string }[], dateRange?: DateRange) {
 }
 
 interface PrChartProps {
+  prs: Pick<PullRequest, 'openedAt'>[];
   dateRange?: DateRange;
 }
 
-export function PrChart({ dateRange }: PrChartProps) {
-  const [prs, setPrs] = React.useState<{ openedAt: string }[]>([]);
-
-  React.useEffect(() => {
-    pullRequestsService
-      .getAll()
-      .then(setPrs)
-      .catch(() => {});
-  }, []);
-
+export function PrChart({ prs, dateRange }: PrChartProps) {
   const chartData = React.useMemo(
     () => buildDays(prs, dateRange),
     [prs, dateRange],
