@@ -7,8 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import type { PullRequest } from '@/types/pull-request'
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import type { PullRequest } from "@/types/pull-request"
 
 const statusStyles: Record<string, string> = {
   'aberto':   'text-blue-400',
