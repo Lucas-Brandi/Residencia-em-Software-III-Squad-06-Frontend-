@@ -1,88 +1,98 @@
-  import { Github, Calendar, Gauge } from "lucide-react"
-  import { prAnalysisMock, findings, timeline } from "@/mocks/pr-analysis"
-  import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-  import { AppSidebar } from "@/components/layout/app-sidebar"
-  import { FindingsFilter } from "@/components/ui/findings-filter"
-  import { PRTimeline } from "@/components/ui/pr-timeline"
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { FindingsFilter } from '@/components/ui/findings-filter';
+import { PRTimeline } from '@/components/ui/pr-timeline';
+import { PRAnalysisInfoCard } from '@/components/layout/pr-analysis-info-card';
+import { usePRAnalysis } from '@/hooks/use-pr-analysis';
+import { findings } from '@/mocks/pr-analysis';
+import type { AnalysisResult } from '@/types/analysis-result';
 
-  export default function PRAnalysis() {
-    const pr = prAnalysisMock
+function buildTimeline(analysis: AnalysisResult) {
+  const toTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
+  return [
+    {
+      id: 1,
+      label: `PR #${analysis.pr.prNumber} aberto`,
+      time: toTime(analysis.pr.openedAt),
+    },
+    {
+      id: 2,
+      label: 'Análise da IA Iniciada',
+      time: toTime(analysis.createdAt),
+    },
+    { id: 3, label: 'Análise Concluída', time: toTime(analysis.createdAt) },
+    { id: 4, label: `Status: ${analysis.status}`, time: '' },
+  ];
+}
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar activePath="" />
+      <SidebarInset>
+        <main className="p-8">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+export default function PRAnalysis() {
+  const { pr, analysis, loading, error } = usePRAnalysis();
+
+  if (loading)
     return (
-      <SidebarProvider>
-        <AppSidebar activePath="" />
+      <PageShell>
+        <p className="text-muted-foreground text-sm">Carregando...</p>
+      </PageShell>
+    );
+  if (error)
+    return (
+      <PageShell>
+        <p className="text-red-400 text-sm">{error}</p>
+      </PageShell>
+    );
+  if (!pr)
+    return (
+      <PageShell>
+        <p className="text-red-400 text-sm">PR não encontrado.</p>
+      </PageShell>
+    );
 
-        <SidebarInset>
-          <main className="min-h-screen p-8 space-y-6">
+  const timeline = analysis ? buildTimeline(analysis) : [];
 
-            <div className="flex items-center gap-3">
-              <SidebarTrigger />
-              <h1 className="text-2xl font-bold text-foreground">
-                Análise de Pull Requests: PR #{pr.id} - {pr.title}
-              </h1>
-            </div>
+  return (
+    <SidebarProvider>
+      <AppSidebar activePath="" />
+      <SidebarInset>
+        <main className="min-h-screen p-8 space-y-6">
+          <div className="flex items-center gap-3">
+            <SidebarTrigger />
+            <h1 className="text-2xl font-bold text-foreground">
+              Análise de Pull Requests: PR #{pr.prNumber} - {pr.title}
+            </h1>
+          </div>
 
-            {/* Header card */}
-            <div className="rounded-xl border border-border overflow-hidden">
-              <div className="grid grid-cols-4 divide-x divide-border" style={{ backgroundColor: "#39505B" }}>
-                <div className="flex flex-col items-center justify-center gap-1 p-5">
-                  <p className="text-xs text-muted-foreground">Repositório</p>
-                  <div className="flex items-center gap-2 text-sm text-foreground font-medium">
-                    <Github size={15} className="text-muted-foreground" />
-                    {pr.repository}
-                  </div>
-                </div>
+          <PRAnalysisInfoCard pr={pr} analysis={analysis} />
 
-                <div className="flex flex-col items-center justify-center gap-1 p-5">
-                  <p className="text-xs text-muted-foreground">Autor do PR</p>
-                  <div className="flex items-center gap-2 text-sm text-foreground font-medium">
-                    <img
-                      src={`https://github.com/${pr.githubUsername}.png?size=32`}
-                      alt={pr.author}
-                      className="w-6 h-6 rounded-full object-cover"
-                      onError={(e) => { e.currentTarget.style.display = "none" }}
-                    />
-                    {pr.author}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center gap-1 p-5">
-                  <p className="text-xs text-muted-foreground">Enviado em</p>
-                  <div className="flex items-center gap-2 text-sm text-foreground font-medium">
-                    <Calendar size={15} className="text-muted-foreground" />
-                    {pr.sentAt}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center gap-1 p-5">
-                  <p className="text-xs text-muted-foreground">Score</p>
-                  <div
-                    className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold"
-                    style={{ backgroundColor: "#1a3d2b", color: "#4ade80", border: "1px solid #166534" }}
-                  >
-                    <Gauge size={15} />
-                    {pr.score}/100
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-5" style={{ backgroundColor: "#1A2731" }}>
-                <p className="text-sm text-muted-foreground leading-relaxed">{pr.summary}</p>
-              </div>
-            </div>
-
-            {/* Findings + Timeline */}
-            <div className="grid grid-cols-[1fr_280px] gap-6 items-start">
-              <FindingsFilter findings={findings} />
-              <PRTimeline
-                events={timeline}
-                githubUrl="https://github.com"
-                onReanalyze={() => alert("Re-analisando...")}
-              />
-            </div>
-
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
-    )
-  }
+          <div className="grid grid-cols-[1fr_280px] gap-6 items-start">
+            <FindingsFilter findings={findings} />
+            <PRTimeline
+              events={timeline}
+              githubUrl={pr.githubUrl ?? undefined}
+              onReanalyze={() => alert('Re-analisando...')}
+            />
+          </div>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}

@@ -9,21 +9,34 @@ export function Login() {
   const [senha, setSenha] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (usuario && senha) {
-      console.log('Login bem-sucedido!');
-      navigate('/dashboard');
-    } else {
+    if (!usuario || !senha) {
       alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: usuario, password: senha }),
+      });
+
+      const json = await res.json();
+      const token = json.accessToken;
+      if (!token) throw new Error('Token não encontrado');
+
+      localStorage.setItem('token', token);
+      navigate('/dashboard');
+    } catch {
+      alert('Erro ao fazer login. Verifique suas credenciais.');
     }
   };
 
   return (
     <div className="min-h-screen bg-[#050B14] flex items-center justify-center p-4">
-      
       <div className="w-full max-w-[420px] bg-[#0A1128]/40 backdrop-blur-md border border-white/10 rounded-2xl p-10 shadow-2xl relative z-10">
-        
         <div className="text-center mb-6">
           <h2 className="text-white tracking-[0.4em] text-[11px] uppercase font-semibold drop-shadow-md">
             Starian
@@ -31,12 +44,13 @@ export function Login() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-white text-[22px] font-medium mb-3 drop-shadow-md">Seja bem-vindo!</h1>
+          <h1 className="text-white text-[22px] font-medium mb-3 drop-shadow-md">
+            Seja bem-vindo!
+          </h1>
           <div className="w-24 h-[1px] bg-white/30 mx-auto"></div>
         </div>
 
         <form className="space-y-5" onSubmit={handleLogin}>
-          
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
               <User size={16} className="text-gray-600" />
@@ -65,13 +79,16 @@ export function Login() {
 
           <div className="flex items-center justify-between text-[11px] text-gray-300 mt-2 px-1">
             <label className="flex items-center cursor-pointer hover:text-white transition-colors">
-              <input 
-                type="checkbox" 
-                className="mr-2 w-3.5 h-3.5 rounded-sm bg-white/10 border-white/20 cursor-pointer accent-blue-500" 
+              <input
+                type="checkbox"
+                className="mr-2 w-3.5 h-3.5 rounded-sm bg-white/10 border-white/20 cursor-pointer accent-blue-500"
               />
               Lembre-se de mim.
             </label>
-            <Link to="/recuperarSenha" className="hover:text-white transition-colors underline decoration-gray-500/50 underline-offset-2">
+            <Link
+              to="/recuperarSenha"
+              className="hover:text-white transition-colors underline decoration-gray-500/50 underline-offset-2"
+            >
               Esqueceu a senha?
             </Link>
           </div>
@@ -88,11 +105,13 @@ export function Login() {
         </form>
 
         <div className="mt-8 flex items-center justify-center gap-4 border-t border-white/10 pt-6">
-          <Link to="/cadastro" className="text-[11px] text-gray-300 hover:text-white transition-colors">
+          <Link
+            to="/cadastro"
+            className="text-[11px] text-gray-300 hover:text-white transition-colors"
+          >
             Cadastre-se aqui.
           </Link>
         </div>
-
       </div>
     </div>
   );
