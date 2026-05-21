@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -8,22 +8,89 @@ import { RulesTable } from '@/components/layout/rules-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
 import { RuleFormModal } from '@/components/modals/rule-form-modal';
 import { ConfirmDeleteModal } from '@/components/modals/confirm-delete-modal';
-import { mockRegras } from '@/mocks/rules';
 import { Regra } from '@/types/rules';
 
 export function Regras() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [regras, setRegras] = useState(mockRegras);
+  const [regras, setRegras] = useState<Regra[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<Regra | undefined>();
   const [deletingRuleId, setDeletingRuleId] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState<string>('');
+
+  const repositoryId = "2a446e40-8422-4471-91fd-7d0f9faa59a9";
+
+  useEffect(() => {
+    fazerLoginFantasma();
+  }, []);
+
+  const fazerLoginFantasma = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: "john_doe",
+          password: "SecurePass123"
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.accessToken) {
+        setToken(data.accessToken);
+        fetchRules(data.accessToken);
+      }
+    } catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
+  const fetchRules = async (currentToken: string = token) => {
+    if (!currentToken) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules?repositoryId=${repositoryId}`, {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`
+        }
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+
+        let rawData = [];
+        if (Array.isArray(responseData)) {
+          rawData = responseData;
+        } else if (responseData && Array.isArray(responseData.data)) {
+          rawData = responseData.data;
+        }
+
+        const regrasFormatadas = rawData.map((item: any) => ({
+          id: item.id,
+          titulo: item.content || 'Sem título',
+          categoria: item.ruleType || 'Estilo',
+          gravidade: item.severity || 'Aviso', 
+          status: item.isActive !== false ? 'Ativo' : 'Inativo',
+        }));
+
+        setRegras(regrasFormatadas);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredRegras = regras.filter((regra) =>
-    regra.titulo.toLowerCase().includes(searchTerm.toLowerCase()),
+    (regra.titulo || '').toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredRegras.length / itemsPerPage);
@@ -41,31 +108,85 @@ export function Regras() {
     setCurrentPage(1);
   };
 
-  const handleCreateRule = (newRule: Omit<Regra, 'id'>) => {
-    const newId = `#${regras.length + 1}`;
-    const rule: Regra = {
-      ...newRule,
-      id: newId,
-    };
-    setRegras((prev) => [...prev, rule]);
+  const handleCreateRule = async (newRule: any) => {
+    try {
+      const payload = {
+        repositoryId: repositoryId,
+        ruleType: newRule.categoria,
+        content: newRule.titulo,
+        severity: newRule.gravidade,
+        isActive: newRule.status === 'Ativo' || newRule.status === true,
+        createdById: 1
+      };
+
+      console.log("Enviando para Criar:", payload); 
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        fetchRules();
+        setIsCreateModalOpen(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleEditRule = (updatedRule: Omit<Regra, 'id'>) => {
+  const handleEditRule = async (updatedRule: any) => {
     if (!editingRule) return;
+    try {
+      const payload = {
+        repositoryId: repositoryId,
+        ruleType: updatedRule.categoria,
+        content: updatedRule.titulo,
+        severity: updatedRule.gravidade,
+        isActive: updatedRule.status === 'Ativo' || updatedRule.status === true,
+        createdById: 1
+      };
 
-    setRegras((prev) =>
-      prev.map((regra) =>
-        regra.id === editingRule.id ? { ...regra, ...updatedRule } : regra,
-      ),
-    );
-    setEditingRule(undefined);
+      console.log("Enviando para Editar:", payload);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules/${editingRule.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        fetchRules();
+        setIsEditModalOpen(false);
+        setEditingRule(undefined);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDeleteRule = () => {
+  const handleDeleteRule = async () => {
     if (!deletingRuleId) return;
-
-    setRegras((prev) => prev.filter((regra) => regra.id !== deletingRuleId));
-    setDeletingRuleId(undefined);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules/${deletingRuleId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        fetchRules();
+        setIsDeleteModalOpen(false);
+        setDeletingRuleId(undefined);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const openEditModal = (regra: Regra) => {
@@ -108,11 +229,15 @@ export function Regras() {
             </Button>
           </div>
 
-          <RulesTable
-            regras={paginatedRegras}
-            onEdit={openEditModal}
-            onDelete={openDeleteModal}
-          />
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Carregando regras...</p>
+          ) : (
+             <RulesTable
+               regras={paginatedRegras}
+               onEdit={openEditModal}
+               onDelete={openDeleteModal}
+             />
+          )}
 
           <PaginationControls
             totalItems={filteredRegras.length}
@@ -125,7 +250,6 @@ export function Regras() {
         </main>
       </SidebarInset>
 
-      {/* Modals */}
       <RuleFormModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
