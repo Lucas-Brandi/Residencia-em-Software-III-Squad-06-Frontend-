@@ -19,9 +19,6 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
           <thead>
             <tr className="border-b border-border">
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <div className="flex items-center gap-1">
                   Título
                   <div className="flex flex-col">
@@ -29,6 +26,9 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
                     <ChevronDown className="h-3 w-3 text-muted-foreground" />
                   </div>
                 </div>
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <div className="flex items-center gap-1">
@@ -68,11 +68,11 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
                 key={regra.id}
                 className="hover:bg-muted/50 transition-colors"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                  {regra.id}
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {regra.titulo}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  {regra.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {regra.categoria}
