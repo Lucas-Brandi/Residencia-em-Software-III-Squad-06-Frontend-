@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { UserCircle } from 'lucide-react'
 import type { User } from '@/types/user'
 
-// O ID 1 corresponde ao john doe criado no banco local
+// O id 1 corresponde ao john doe criado no banco local
 const CURRENT_USER_ID = 1
 
 export function Perfil() {
@@ -125,21 +125,27 @@ export function Perfil() {
       <AppSidebar activePath="/perfil" />
 
       <SidebarInset>
-        <div className="relative min-h-screen flex flex-col">
-
-          <div className="absolute top-6 left-6 z-10">
+        <main className="p-6 space-y-6">
+          <div className="flex items-center gap-4">
             <SidebarTrigger />
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Perfil</h1>
+              <p className="text-sm text-muted-foreground">
+                Atualize seus dados pessoais e redes sociais.
+              </p>
+            </div>
           </div>
 
-          <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
+          <div className="flex items-center justify-center pt-8 pb-20 relative">
+            
+            <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-x-full -translate-y-1/2 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl translate-x-0 -translate-y-1/2 pointer-events-none" />
 
-          <div className="flex-1 flex items-center justify-center px-6 py-20">
-            <Card className="w-full max-w-2xl border-border" style={{ backgroundColor: '#1A2731' }}>
+            <Card className="w-full max-w-2xl border-border relative z-10" style={{ backgroundColor: '#1A2731' }}>
 
               <CardHeader className="pb-4 border-b border-border text-center">
                 <CardTitle className="text-lg font-semibold">Minha Conta</CardTitle>
-                <CardDescription>Atualize seus dados pessoais.</CardDescription>
+                <CardDescription>Gerencie suas informações abaixo.</CardDescription>
               </CardHeader>
 
               <CardContent className="pt-6">
@@ -169,7 +175,7 @@ export function Perfil() {
                         <label className="text-sm font-medium text-foreground">GitHub</label>
                         <Input
                           type="text"
-                          placeholder="Seu usuário do GitHub"
+                          placeholder="Ex: seu-usuario-aqui"
                           value={githubInput}
                           onChange={(e) => setGithubInput(e.target.value)}
                         />
@@ -231,7 +237,7 @@ export function Perfil() {
             </Card>
           </div>
 
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )
