@@ -52,6 +52,20 @@ export function Regras() {
     }
   };
 
+  const parseSeverityToBackend = (gravidade?: string) => {
+    if (!gravidade) return 'AVISO';
+    const normalized = gravidade.toLowerCase();
+    if (normalized.includes('dica') || normalized.includes('info')) return 'INFO';
+    if (normalized.includes('crítico') || normalized.includes('critico')) return 'CRITICO';
+    return 'AVISO';
+  };
+
+  const parseSeverityToFrontend = (severity?: string) => {
+    if (severity === 'CRITICO') return 'Crítico';
+    if (severity === 'INFO') return 'Dica';
+    return 'Aviso';
+  };
+
   const fetchRules = async (currentToken: string = token) => {
     if (!currentToken) return;
 
@@ -76,7 +90,7 @@ export function Regras() {
           id: item.id,
           titulo: item.content || 'Sem título',
           categoria: item.ruleType || 'Estilo',
-          gravidade: item.severity || 'Aviso', 
+          gravidade: parseSeverityToFrontend(item.severity), 
           status: item.isActive !== false ? 'Ativo' : 'Inativo',
         }));
 
@@ -114,12 +128,12 @@ export function Regras() {
         repositoryId: repositoryId,
         ruleType: newRule.categoria,
         content: newRule.titulo,
-        severity: newRule.gravidade,
+        severity: parseSeverityToBackend(newRule.gravidade), 
         isActive: newRule.status === 'Ativo' || newRule.status === true,
         createdById: 1
       };
 
-      console.log("Enviando para Criar:", payload); 
+      console.log("Enviando para Criar (DTO Enum):", payload); 
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules`, {
         method: 'POST',
@@ -132,6 +146,9 @@ export function Regras() {
       if (response.ok) {
         fetchRules();
         setIsCreateModalOpen(false);
+      } else {
+        const errorData = await response.json();
+        console.error("Erro na validação do DTO:", errorData);
       }
     } catch (error) {
       console.error(error);
@@ -145,12 +162,12 @@ export function Regras() {
         repositoryId: repositoryId,
         ruleType: updatedRule.categoria,
         content: updatedRule.titulo,
-        severity: updatedRule.gravidade,
+        severity: parseSeverityToBackend(updatedRule.gravidade), 
         isActive: updatedRule.status === 'Ativo' || updatedRule.status === true,
         createdById: 1
       };
 
-      console.log("Enviando para Editar:", payload);
+      console.log("Enviando para Editar (DTO Enum):", payload);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/analysis-rules/${editingRule.id}`, {
         method: 'PATCH',
@@ -164,6 +181,9 @@ export function Regras() {
         fetchRules();
         setIsEditModalOpen(false);
         setEditingRule(undefined);
+      } else {
+        const errorData = await response.json();
+        console.error("Erro na validação do DTO:", errorData);
       }
     } catch (error) {
       console.error(error);
