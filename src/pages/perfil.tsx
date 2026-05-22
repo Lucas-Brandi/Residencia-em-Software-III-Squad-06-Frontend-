@@ -5,10 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { UserCircle } from 'lucide-react'
-import { usersService } from '@/services/users'
 import type { User } from '@/types/user'
 
-// Substituir pelo ID do usuário logado quando auth estiver pronto
+// O ID 1 corresponde ao john doe criado no banco local
 const CURRENT_USER_ID = 1
 
 export function Perfil() {
@@ -19,29 +18,103 @@ export function Perfil() {
   const [success, setSuccess] = React.useState(false)
   const [avatarError, setAvatarError] = React.useState(false)
   const [password, setPassword] = React.useState('')
+  const [githubInput, setGithubInput] = React.useState('')
+  const [token, setToken] = React.useState<string>('')
 
   React.useEffect(() => {
-    usersService.getById(CURRENT_USER_ID)
-      .then(setUser)
-      .catch(() => setError('Erro ao carregar perfil.'))
-      .finally(() => setLoading(false))
+    fazerLoginFantasma()
   }, [])
 
+  // 1 - Autentica com o john doe para obter o token jwt
+  const fazerLoginFantasma = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: "john_doe",
+          password: "SecurePass123" 
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.accessToken) {
+        setToken(data.accessToken)
+        fetchUserProfile(data.accessToken)
+      } else {
+        setError('Erro na autenticação do perfil.')
+        setLoading(false)
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Erro de conexão ao autenticar.')
+      setLoading(false)
+    }
+  }
+
+  // 2 - Busca os dados do perfil usando o token obtido
+  const fetchUserProfile = async (currentToken: string) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${CURRENT_USER_ID}`, {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data)
+        setGithubInput(data.githubUsername || '') 
+      } else {
+        setError('Erro ao carregar os dados do perfil.')
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Erro de conexão ao buscar perfil.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 3 - Envia as atualizações protegidas pelo token
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) return
+    if (!user || !token) return
+    
     setSaving(true)
     setError(null)
     setSuccess(false)
+    setAvatarError(false)
 
     try {
-      await usersService.update(CURRENT_USER_ID, {
-        ...(password.length >= 6 ? { password } : {}),
+      const payload: any = {
+        githubUsername: githubInput,
+      }
+      
+      if (password.length >= 6) {
+        payload.password = password
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users/${CURRENT_USER_ID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
       })
-      setSuccess(true)
-      setPassword('')
-    } catch {
-      setError('Erro ao salvar alterações.')
+
+      if (response.ok) {
+        setSuccess(true)
+        setPassword('')
+        setUser({ ...user, githubUsername: githubInput })
+      } else {
+        setError('Erro ao salvar alterações.')
+      }
+    } catch (err) {
+      console.error(err)
+      setError('Erro de conexão ao salvar.')
     } finally {
       setSaving(false)
     }
@@ -96,9 +169,9 @@ export function Perfil() {
                         <label className="text-sm font-medium text-foreground">GitHub</label>
                         <Input
                           type="text"
-                          value={user.githubUsername ?? ''}
-                          disabled
-                          className="opacity-60 cursor-not-allowed"
+                          placeholder="Seu usuário do GitHub"
+                          value={githubInput}
+                          onChange={(e) => setGithubInput(e.target.value)}
                         />
                       </div>
 
