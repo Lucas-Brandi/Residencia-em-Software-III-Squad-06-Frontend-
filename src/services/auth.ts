@@ -1,23 +1,11 @@
-import { http } from '@/services/http';
-
-export interface LoginDto {
-  username: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  user: {
-    id: number;
-    username: string;
-    role: string;
-  };
-}
-
 export const authService = {
-  login: (dto: LoginDto) =>
-    http<AuthResponse>('/auth/login', {
+  login: async (dto: LoginDto): Promise<AuthResponse> => {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dto),
-    }),
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    return res.json();
+  },
 };
