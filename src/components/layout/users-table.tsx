@@ -9,7 +9,7 @@ import { UsuarioAdmin } from '@/types/admin';
 interface UsersTableProps {
   usuarios: UsuarioAdmin[];
   onEdit?: (usuario: UsuarioAdmin) => void;
-  onDelete?: (usuarioId: string) => void;
+  onDelete?: (usuarioId: number) => void;
   searchTerm?: string;
   onSearchChange?: (value: string) => void;
   onInviteUser?: () => void;

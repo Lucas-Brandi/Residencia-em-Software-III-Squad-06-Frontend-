@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -10,19 +10,44 @@ import { PaginationControls } from '@/components/ui/pagination-controls';
 import { InviteUserModal } from '@/components/modals/invite-user-modal';
 import { ConfirmDeleteUserModal } from '@/components/modals/confirm-delete-user-modal';
 import { adminStatCards, mockUsuarios } from '@/mocks/admin';
-import { UsuarioAdmin, RoleUsuario } from '@/types/admin';
+import { UsuarioAdmin, mapUserToUsuarioAdmin } from '@/types/admin';
+import { usersService } from '@/services/users';
 
 export function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [usuarios, setUsuarios] = useState(mockUsuarios);
+  const [usuarios, setUsuarios] = useState<UsuarioAdmin[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletingUserId, setDeletingUserId] = useState<string | undefined>();
+  const [deletingUserId, setDeletingUserId] = useState<number | undefined>();
   const [editingUser, setEditingUser] = useState<UsuarioAdmin | undefined>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const editingUserRef = useRef<UsuarioAdmin | undefined>(undefined);
+
+  // Buscar usuários ao carregar a página
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const users = await usersService.getAll();
+        const usuariosAdmin = users.map(mapUserToUsuarioAdmin);
+        setUsuarios(usuariosAdmin);
+      } catch (err) {
+        console.error('Erro ao buscar usuários:', err);
+        setError('Erro ao carregar usuários. Usando dados de exemplo.');
+        // Fallback para dados mockados em caso de erro
+        setUsuarios(mockUsuarios);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
 
   const filteredUsuarios = usuarios.filter((usuario) =>
     usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -43,46 +68,72 @@ export function Admin() {
     setCurrentPage(1);
   };
 
-  const handleInviteUser = (userData: {
+  const handleInviteUser = async (userData: {
     nome: string;
     email: string;
-    role: RoleUsuario;
+    role: 'ADMIN' | 'USER';
+    password?: string;
   }) => {
-    const currentEditing = editingUserRef.current;
+    try {
+      const currentEditing = editingUserRef.current;
 
-    if (currentEditing) {
-      setUsuarios((prev) =>
-        prev.map((usuario) =>
-          usuario.id === currentEditing.id
-            ? { ...usuario, nome: userData.nome, role: userData.role }
-            : usuario,
-        ),
-      );
-      editingUserRef.current = undefined;
-      setEditingUser(undefined);
-    } else {
-      const newId = `#${usuarios.length + 1}`;
-      const newUser: UsuarioAdmin = {
-        id: newId,
-        nome: userData.nome,
-        role: userData.role,
-        status: 'Pendente',
-        ultimoAcesso: 'Nunca',
-      };
-      setUsuarios((prev) => [...prev, newUser]);
+      if (currentEditing) {
+        // Atualizar usuário existente
+        const updateData = {
+          username: userData.nome,
+          email: userData.email,
+          role: userData.role,
+          ...(userData.password && { password: userData.password }),
+        };
+        const updatedUser = await usersService.update(currentEditing.id, updateData);
+        setUsuarios((prev) =>
+          prev.map((usuario) =>
+            usuario.id === currentEditing.id
+              ? mapUserToUsuarioAdmin(updatedUser)
+              : usuario,
+          ),
+        );
+        editingUserRef.current = undefined;
+        setEditingUser(undefined);
+      } else {
+        // Criar novo usuário
+        if (!userData.password) {
+          setError('Senha é obrigatória para criar novo usuário');
+          return;
+        }
+        const createData = {
+          username: userData.nome,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role,
+        };
+        const newUser = await usersService.create(createData);
+        setUsuarios((prev) => [...prev, mapUserToUsuarioAdmin(newUser)]);
+      }
+      setError(null);
+    } catch (err) {
+      console.error('Erro ao convidar/atualizar usuário:', err);
+      setError('Erro ao processar usuário');
     }
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (!deletingUserId) return;
 
-    setUsuarios((prev) =>
-      prev.filter((usuario) => usuario.id !== deletingUserId),
-    );
-    setDeletingUserId(undefined);
+    try {
+      await usersService.delete(deletingUserId);
+      setUsuarios((prev) =>
+        prev.filter((usuario) => usuario.id !== deletingUserId),
+      );
+      setDeletingUserId(undefined);
+      setError(null);
+    } catch (err) {
+      console.error('Erro ao deletar usuário:', err);
+      setError('Erro ao deletar usuário');
+    }
   };
 
-  const openDeleteModal = (userId: string) => {
+  const openDeleteModal = (userId: number) => {
     setDeletingUserId(userId);
     setIsDeleteModalOpen(true);
   };
@@ -110,6 +161,12 @@ export function Admin() {
             </div>
           </div>
 
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              {error}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {adminStatCards.map((card, index) => (
               <StatCard key={index} {...card} />
@@ -121,26 +178,34 @@ export function Admin() {
             <IaConfigCard />
           </div>
 
-          <UsersTable
-            usuarios={paginatedUsuarios}
-            onEdit={openEditModal}
-            onDelete={openDeleteModal}
-            searchTerm={searchTerm}
-            onSearchChange={(value) => {
-              setSearchTerm(value);
-              setCurrentPage(1);
-            }}
-            onInviteUser={() => setIsInviteModalOpen(true)}
-          />
+          {isLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <div className="text-muted-foreground">Carregando usuários...</div>
+            </div>
+          ) : (
+            <>
+              <UsersTable
+                usuarios={paginatedUsuarios}
+                onEdit={openEditModal}
+                onDelete={openDeleteModal}
+                searchTerm={searchTerm}
+                onSearchChange={(value) => {
+                  setSearchTerm(value);
+                  setCurrentPage(1);
+                }}
+                onInviteUser={() => setIsInviteModalOpen(true)}
+              />
 
-          <PaginationControls
-            totalItems={filteredUsuarios.length}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            onItemsPerPageChange={handleItemsPerPageChange}
-          />
+              <PaginationControls
+                totalItems={filteredUsuarios.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+              />
+            </>
+          )}
         </main>
       </SidebarInset>
 
