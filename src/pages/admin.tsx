@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -9,9 +9,20 @@ import { UsersTable } from '@/components/layout/users-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
 import { InviteUserModal } from '@/components/modals/invite-user-modal';
 import { ConfirmDeleteUserModal } from '@/components/modals/confirm-delete-user-modal';
+import { DateRangePicker } from '@/components/layout/date-range-picker';
+import { PrChart } from '@/components/ui/pr-chart';
+import { RecentPRs } from '@/components/layout/recent-prs';
 import { adminStatCards, mockUsuarios } from '@/mocks/admin';
 import { UsuarioAdmin, mapUserToUsuarioAdmin } from '@/types/admin';
+import type { PullRequest } from '@/types/pull-request';
 import { usersService } from '@/services/users';
+
+type DateRange = {
+  from?: Date;
+  to?: Date;
+};
+import { pullRequestsService } from '@/services/pull-requests';
+import { buildStatCards } from '@/services/dashboard';
 
 export function Admin() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +37,32 @@ export function Admin() {
   const [error, setError] = useState<string | null>(null);
 
   const editingUserRef = useRef<UsuarioAdmin | undefined>(undefined);
+
+  function getDefaultDateRange(): DateRange {
+    const to = new Date();
+    const from = new Date();
+    from.setDate(from.getDate() - 6);
+    return { from, to };
+  }
+
+  function filterByDateRange(prs: PullRequest[], dateRange?: DateRange) {
+    if (!dateRange?.from) return prs;
+
+    const from = dateRange.from;
+    const to = dateRange.to ?? dateRange.from;
+
+    return prs.filter((pr) => {
+      const opened = new Date(pr.openedAt);
+      return opened >= from && opened <= to;
+    });
+  }
+
+  const [prs, setPrs] = useState<PullRequest[]>([]);
+  const [prLoading, setPrLoading] = useState(true);
+  const [prError, setPrError] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    getDefaultDateRange(),
+  );
 
   // Buscar usuários ao carregar a página
   useEffect(() => {
@@ -49,9 +86,34 @@ export function Admin() {
     fetchUsuarios();
   }, []);
 
+  useEffect(() => {
+    const fetchPRs = async () => {
+      try {
+        setPrLoading(true);
+        setPrError(null);
+        const result = await pullRequestsService.getAll();
+        setPrs(result);
+      } catch (err) {
+        console.error('Erro ao buscar pull requests:', err);
+        setPrError('Erro ao carregar PRs');
+      } finally {
+        setPrLoading(false);
+      }
+    };
+
+    fetchPRs();
+  }, []);
+
   const filteredUsuarios = usuarios.filter((usuario) =>
     usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const filteredPRs = useMemo(
+    () => filterByDateRange(prs, dateRange),
+    [prs, dateRange],
+  );
+
+  const prStatCards = useMemo(() => buildStatCards(filteredPRs), [filteredPRs]);
 
   const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage);
   const paginatedUsuarios = filteredUsuarios.slice(
@@ -177,6 +239,41 @@ export function Admin() {
             <ApiKeyCard />
             <IaConfigCard />
           </div>
+
+          <section className="space-y-6">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">
+                  Visão de Pull Requests
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Resultados do backend de PRs para o painel administrativo.
+                </p>
+              </div>
+              <DateRangePicker value={dateRange} onChange={setDateRange} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+              {prStatCards.map((card) => (
+                <StatCard key={card.title} {...card} />
+              ))}
+            </div>
+
+            {prLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <div className="text-muted-foreground">Carregando PRs...</div>
+              </div>
+            ) : prError ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+                {prError}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <PrChart prs={filteredPRs} dateRange={dateRange} />
+                <RecentPRs prs={filteredPRs} />
+              </div>
+            )}
+          </section>
 
           {isLoading ? (
             <div className="flex justify-center items-center p-8">
