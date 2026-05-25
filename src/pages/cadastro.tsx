@@ -1,57 +1,57 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { User, Github, Lock } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { usersService } from '@/services/users'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Github, Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { usersService } from '@/services/users';
 
 export function Register() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: '',
     githubUsername: '',
     password: '',
     confirmarSenha: '',
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     if (formData.password !== formData.confirmarSenha) {
-      setError('As senhas não conferem!')
-      return
+      setError('As senhas não conferem!');
+      return;
     }
 
     if (formData.password.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres.')
-      return
+      setError('A senha deve ter no mínimo 6 caracteres.');
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
       await usersService.create({
         username: formData.username,
         githubUsername: formData.githubUsername,
         avatarUrl: `https://github.com/${formData.githubUsername}.png`,
         password: formData.password,
-        role: 'dev',
-      })
-      navigate('/dashboard')
+        role: 'USER',
+      });
+      navigate('/dashboard');
     } catch {
-      setError('Erro ao criar conta. Tente novamente.')
+      setError('Erro ao criar conta. Tente novamente.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#050B14] flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -127,9 +127,7 @@ export function Register() {
             />
           </div>
 
-          {error && (
-            <p className="text-red-400 text-sm text-center">{error}</p>
-          )}
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
           <div className="flex justify-center pt-4">
             <Button
@@ -153,5 +151,5 @@ export function Register() {
         </div>
       </div>
     </div>
-  )
+  );
 }
