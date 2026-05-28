@@ -22,14 +22,16 @@ export function PRTable({ pullRequests }: PRTableProps) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-border">
-            {['ID', 'Título', 'Autor', 'Status', ''].map((col) => (
-              <th
-                key={col}
-                className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider last:text-right"
-              >
-                {col}
-              </th>
-            ))}
+            {['ID', 'Título', 'Repositório', 'Autor', 'Status', ''].map(
+              (col) => (
+                <th
+                  key={col}
+                  className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider last:text-right"
+                >
+                  {col}
+                </th>
+              ),
+            )}
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -40,7 +42,10 @@ export function PRTable({ pullRequests }: PRTableProps) {
               </td>
               <td className="px-6 py-4 text-sm text-foreground">{pr.title}</td>
               <td className="px-6 py-4 text-sm text-muted-foreground">
-                {pr.author.username}
+                {pr.repository?.name ?? '—'}
+              </td>
+              <td className="px-6 py-4 text-sm text-muted-foreground">
+                {pr.author?.username ?? '—'}
               </td>
               <td className="px-6 py-4">
                 <StatusBadge status={pr.status} />
@@ -61,7 +66,7 @@ export function PRTable({ pullRequests }: PRTableProps) {
                       className="cursor-pointer text-sm"
                       onClick={() => navigate(`/pr/${pr.id}`)}
                     >
-                      Ver PR #{pr.id}
+                      Ver PR #{pr.prNumber}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
