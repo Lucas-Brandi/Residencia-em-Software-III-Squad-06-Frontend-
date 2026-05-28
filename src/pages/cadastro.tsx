@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Github, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { usersService } from '@/services/users';
 
 export function Register() {
   const navigate = useNavigate();
@@ -37,20 +38,14 @@ export function Register() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          githubUsername: formData.githubUsername,
-          avatarUrl: `https://github.com/${formData.githubUsername}.png`,
-          password: formData.password,
-          role: 'USER',
-        }),
+      await usersService.create({
+        username: formData.username,
+        githubUsername: formData.githubUsername,
+        avatarUrl: `https://github.com/${formData.githubUsername}.png`,
+        password: formData.password,
+        role: 'USER',
       });
-
-      if (!res.ok) throw new Error(`${res.status}`);
-      navigate('/login');
+      navigate('/dashboard');
     } catch {
       setError('Erro ao criar conta. Tente novamente.');
     } finally {

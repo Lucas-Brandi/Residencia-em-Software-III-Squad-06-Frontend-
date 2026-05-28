@@ -5,10 +5,10 @@ import { Regras } from '@/pages/regras';
 import { Admin } from '@/pages/admin';
 import { Perfil } from '@/pages/perfil';
 import { Login } from '@/pages/login';
-import { Register } from '@/pages/cadastro'; 
-import { ForgotPassword } from '@/pages/recuperarSenha'; 
+import { Register } from '@/pages/cadastro';
+import { ForgotPassword } from '@/pages/recuperarSenha';
+import { Repositorios } from '@/pages/repositorios';
 import PRAnalysis from '@/pages/pr-analysis';
-
 
 function App() {
   return (
@@ -23,6 +23,7 @@ function App() {
       <Route path="/admin" element={<Admin />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/pr/:id" element={<PRAnalysis />} />
+      <Route path="/repositorios" element={<Repositorios />} />
     </Routes>
   );
 }

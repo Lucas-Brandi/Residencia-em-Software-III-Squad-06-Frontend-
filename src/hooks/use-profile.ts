@@ -35,24 +35,26 @@ export function useProfile() {
       .finally(() => setLoading(false));
   }, [currentUser]);
 
-  const updateProfile = async () => {
+  const updateProfile = async (githubInput: string) => {
     if (!user || !currentUser) return;
 
     setSaving(true);
     setError(null);
     setSuccess(false);
 
-    const payload: Record<string, string> = {};
+    const payload: Record<string, string> = {
+      githubUsername: githubInput,
+      avatarUrl: `https://github.com/${githubInput}.png`,
+    };
 
-    if (password.length >= 6) {
-      payload.password = password;
-    }
+    if (password.length >= 6) payload.password = password;
 
     http<User>(`/users/${currentUser.id}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     })
       .then((updated) => {
+        console.log('updated:', updated);
         setUser(updated);
         setPassword('');
         setSuccess(true);

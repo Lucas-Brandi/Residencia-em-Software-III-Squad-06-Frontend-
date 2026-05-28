@@ -57,7 +57,7 @@ export default function PullRequests() {
 
           <div className="flex items-center gap-4">
             <Input
-              placeholder="Pesquisar por título"
+              placeholder="Pesquisar"
               className="w-64"
               value={search}
               onChange={(e) => {

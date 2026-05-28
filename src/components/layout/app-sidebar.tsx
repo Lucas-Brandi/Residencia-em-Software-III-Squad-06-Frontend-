@@ -15,26 +15,35 @@ import {
   Settings,
   UserCircle,
   X,
+  GitBranch,
 } from 'lucide-react';
-
-// Mock user role - in real app, this would come from auth context
-const currentUserRole = 'admin'; // Change to 'dev' or 'reviewer' to test hiding
-
-const navItems = [
-  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
-  { title: 'Regras', href: '/regras', icon: ListChecks },
-  ...(currentUserRole === 'admin'
-    ? [{ title: 'Administração', href: '/admin', icon: Settings }]
-    : []),
-];
 
 interface AppSidebarProps {
   activePath?: string;
 }
 
+function getCurrentUserRole(): string {
+  try {
+    const raw = localStorage.getItem('user');
+    return raw ? JSON.parse(raw).role : 'USER';
+  } catch {
+    return 'USER';
+  }
+}
+
 export function AppSidebar({ activePath = '/dashboard' }: AppSidebarProps) {
   const { toggleSidebar } = useSidebar();
+  const currentUserRole = getCurrentUserRole();
+
+  const navItems = [
+    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
+    { title: 'Regras', href: '/regras', icon: ListChecks },
+    { title: 'Repositórios', href: '/repositorios', icon: GitBranch },
+    ...(currentUserRole === 'ADMIN'
+      ? [{ title: 'Administração', href: '/admin', icon: Settings }]
+      : []),
+  ];
 
   return (
     <Sidebar collapsible="offcanvas" className="border-none">

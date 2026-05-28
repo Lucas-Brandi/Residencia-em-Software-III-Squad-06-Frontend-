@@ -1,7 +1,10 @@
 import { useState, useRef } from 'react';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { StatCard } from '@/components/ui/stat-card';
 import { ApiKeyCard } from '@/components/layout/api-key-card';
 import { IaConfigCard } from '@/components/layout/ia-config-card';
@@ -9,88 +12,52 @@ import { UsersTable } from '@/components/layout/users-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
 import { InviteUserModal } from '@/components/modals/invite-user-modal';
 import { ConfirmDeleteUserModal } from '@/components/modals/confirm-delete-user-modal';
-import { adminStatCards, mockUsuarios } from '@/mocks/admin';
-import { UsuarioAdmin, RoleUsuario } from '@/types/admin';
+import { useAdmin } from '@/hooks/use-admin';
+import type { UsuarioAdmin, RoleUsuario } from '@/types/admin';
 
 export function Admin() {
+  const { usuarios, loading, error, statCards, invite, update, remove } =
+    useAdmin();
+
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [usuarios, setUsuarios] = useState(mockUsuarios);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletingUserId, setDeletingUserId] = useState<string | undefined>();
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<number | undefined>();
   const [editingUser, setEditingUser] = useState<UsuarioAdmin | undefined>();
-
   const editingUserRef = useRef<UsuarioAdmin | undefined>(undefined);
 
-  const filteredUsuarios = usuarios.filter((usuario) =>
-    usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filtered = usuarios.filter((u) =>
+    u.nome.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
-  const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage);
-  const paginatedUsuarios = filteredUsuarios.slice(
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginated = filtered.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1);
-  };
-
-  const handleInviteUser = (userData: {
+  const handleSubmit = async (data: {
     nome: string;
     email: string;
     role: RoleUsuario;
+    password?: string;
   }) => {
-    const currentEditing = editingUserRef.current;
-
-    if (currentEditing) {
-      setUsuarios((prev) =>
-        prev.map((usuario) =>
-          usuario.id === currentEditing.id
-            ? { ...usuario, nome: userData.nome, role: userData.role }
-            : usuario,
-        ),
-      );
+    if (editingUserRef.current) {
+      await update(editingUserRef.current.id, data);
       editingUserRef.current = undefined;
       setEditingUser(undefined);
     } else {
-      const newId = `#${usuarios.length + 1}`;
-      const newUser: UsuarioAdmin = {
-        id: newId,
-        nome: userData.nome,
-        role: userData.role,
-        status: 'Pendente',
-        ultimoAcesso: 'Nunca',
-      };
-      setUsuarios((prev) => [...prev, newUser]);
+      await invite(data);
     }
+    setIsInviteOpen(false);
   };
 
-  const handleDeleteUser = () => {
+  const handleDelete = async () => {
     if (!deletingUserId) return;
-
-    setUsuarios((prev) =>
-      prev.filter((usuario) => usuario.id !== deletingUserId),
-    );
+    await remove(deletingUserId);
+    setIsDeleteOpen(false);
     setDeletingUserId(undefined);
-  };
-
-  const openDeleteModal = (userId: string) => {
-    setDeletingUserId(userId);
-    setIsDeleteModalOpen(true);
-  };
-
-  const openEditModal = (usuario: UsuarioAdmin) => {
-    editingUserRef.current = usuario;
-    setEditingUser(usuario);
-    setIsInviteModalOpen(true);
   };
 
   return (
@@ -110,8 +77,10 @@ export function Admin() {
             </div>
           </div>
 
+          {error && <p className="text-sm text-red-400">{error}</p>}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            {adminStatCards.map((card, index) => (
+            {statCards.map((card, index) => (
               <StatCard key={index} {...card} />
             ))}
           </div>
@@ -121,48 +90,64 @@ export function Admin() {
             <IaConfigCard />
           </div>
 
-          <UsersTable
-            usuarios={paginatedUsuarios}
-            onEdit={openEditModal}
-            onDelete={openDeleteModal}
-            searchTerm={searchTerm}
-            onSearchChange={(value) => {
-              setSearchTerm(value);
-              setCurrentPage(1);
-            }}
-            onInviteUser={() => setIsInviteModalOpen(true)}
-          />
-
-          <PaginationControls
-            totalItems={filteredUsuarios.length}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            onItemsPerPageChange={handleItemsPerPageChange}
-          />
+          {loading ? (
+            <p className="text-sm text-muted-foreground">
+              Carregando usuários...
+            </p>
+          ) : (
+            <>
+              <UsersTable
+                usuarios={paginated}
+                onEdit={(u) => {
+                  editingUserRef.current = u;
+                  setEditingUser(u);
+                  setIsInviteOpen(true);
+                }}
+                onDelete={(id) => {
+                  setDeletingUserId(id);
+                  setIsDeleteOpen(true);
+                }}
+                searchTerm={searchTerm}
+                onSearchChange={(v) => {
+                  setSearchTerm(v);
+                  setCurrentPage(1);
+                }}
+                onInviteUser={() => setIsInviteOpen(true)}
+              />
+              <PaginationControls
+                totalItems={filtered.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={(n) => {
+                  setItemsPerPage(n);
+                  setCurrentPage(1);
+                }}
+              />
+            </>
+          )}
         </main>
       </SidebarInset>
 
-      {/* Modals */}
       <InviteUserModal
-        isOpen={isInviteModalOpen}
+        isOpen={isInviteOpen}
         onClose={() => {
           editingUserRef.current = undefined;
-          setIsInviteModalOpen(false);
+          setIsInviteOpen(false);
           setEditingUser(undefined);
         }}
-        onSubmit={handleInviteUser}
+        onSubmit={handleSubmit}
         editingUser={editingUser}
       />
 
       <ConfirmDeleteUserModal
-        isOpen={isDeleteModalOpen}
+        isOpen={isDeleteOpen}
         onClose={() => {
-          setIsDeleteModalOpen(false);
+          setIsDeleteOpen(false);
           setDeletingUserId(undefined);
         }}
-        onConfirm={handleDeleteUser}
+        onConfirm={handleDelete}
         userName={usuarios.find((u) => u.id === deletingUserId)?.nome}
       />
     </SidebarProvider>

@@ -12,6 +12,7 @@ export type CategoriaRegra =
 export interface Regra {
   id: string;
   titulo: string;
+  descricao: string;
   categoria: CategoriaRegra;
   gravidade: Gravidade;
   status: StatusRegra;

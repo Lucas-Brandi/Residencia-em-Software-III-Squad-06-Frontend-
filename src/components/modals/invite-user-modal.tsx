@@ -15,7 +15,7 @@ interface InviteUserModalProps {
   editingUser?: UsuarioAdmin;
 }
 
-const roles: RoleUsuario[] = ['Admin', 'Dev', 'Reviewer'];
+const roles: RoleUsuario[] = ['ADMIN', 'USER'];
 
 function InviteUserContent({
   onSubmit,
@@ -26,23 +26,31 @@ function InviteUserContent({
     nome: string;
     email: string;
     role: RoleUsuario;
+    password?: string;
   }) => void;
   onClose: () => void;
   editingUser?: UsuarioAdmin;
 }) {
   const [formData, setFormData] = useState({
     nome: editingUser?.nome || '',
-    email: '',
-    role: editingUser?.role || ('Dev' as RoleUsuario),
+    email: editingUser?.email || '',
+    role: editingUser?.role || ('USER' as RoleUsuario),
+    password: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.nome.trim()) return;
-    if (!editingUser && !formData.email.trim()) return; // ← email só obrigatório ao convidar
+    if (!formData.email.trim()) return;
+    if (!editingUser && !formData.password.trim()) return; // ← senha obrigatória ao criar
 
-    onSubmit(formData);
+    onSubmit({
+      nome: formData.nome,
+      email: formData.email,
+      role: formData.role,
+      password: formData.password || undefined,
+    });
     onClose();
   };
 
@@ -115,6 +123,26 @@ function InviteUserContent({
             }
             placeholder="Digite o email do usuário"
             required
+            className="bg-white text-black border-gray-200"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-foreground mb-1"
+          >
+            Senha {!editingUser && <span className="text-red-500">*</span>}
+          </label>
+          <Input
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, password: e.target.value }))
+            }
+            placeholder={editingUser ? "Deixe em branco para manter a senha" : "Digite uma senha"}
+            required={!editingUser}
             className="bg-white text-black border-gray-200"
           />
         </div>

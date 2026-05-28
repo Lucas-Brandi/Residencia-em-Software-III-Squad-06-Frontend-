@@ -13,6 +13,7 @@ export function ProfileAvatar({ user }: ProfileAvatarProps) {
     <div className="flex flex-col items-center gap-2 pt-1">
       {!avatarError && user.githubUsername ? (
         <img
+          key={user.githubUsername}
           src={`https://github.com/${user.githubUsername}.png?size=96`}
           alt={user.username}
           className="w-20 h-20 rounded-full object-cover border-2 border-border"
