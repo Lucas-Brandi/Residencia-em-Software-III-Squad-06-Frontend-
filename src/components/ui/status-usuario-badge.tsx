@@ -6,34 +6,34 @@ interface StatusUsuarioBadgeProps {
   status: StatusUsuario;
 }
 
-export function StatusUsuarioBadge({ status }: StatusUsuarioBadgeProps) {
-  const getStyles = () => {
-    switch (status) {
-      case 'Ativo':
-        return 'border-green-500/30 text-green-400 bg-green-500/10';
-      case 'Pendente':
-        return 'border-amber-500/30 text-amber-400 bg-amber-500/10';
-    }
-  };
+const statusMap: Record<
+  StatusUsuario,
+  { label: string; styles: string; icon: React.ReactNode }
+> = {
+  ATIVO: {
+    label: 'Ativo',
+    styles: 'border-green-500/30 text-green-400 bg-green-500/10',
+    icon: <CheckCircle className="h-3 w-3" />,
+  },
+  PENDENTE: {
+    label: 'Pendente',
+    styles: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
+    icon: <Clock className="h-3 w-3" />,
+  },
+};
 
-  const getIcon = () => {
-    switch (status) {
-      case 'Ativo':
-        return <CheckCircle className="h-3 w-3" />;
-      case 'Pendente':
-        return <Clock className="h-3 w-3" />;
-    }
-  };
+export function StatusUsuarioBadge({ status }: StatusUsuarioBadgeProps) {
+  const config = statusMap[status];
 
   return (
     <div
       className={cn(
         'inline-flex items-center gap-1.5 px-2 py-1 rounded-full border text-xs font-medium',
-        getStyles(),
+        config.styles,
       )}
     >
-      {getIcon()}
-      {status}
+      {config.icon}
+      {config.label}
     </div>
   );
 }

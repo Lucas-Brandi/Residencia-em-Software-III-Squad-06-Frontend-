@@ -77,7 +77,7 @@ export function UsersTable({
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 <div className="flex items-center gap-1">
-                  Último Acesso
+                  Email
                   <div className="flex flex-col">
                     <ChevronUp className="h-3 w-3 text-muted-foreground" />
                     <ChevronDown className="h-3 w-3 text-muted-foreground" />
@@ -108,7 +108,7 @@ export function UsersTable({
                   <StatusUsuarioBadge status={usuario.status} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                  {usuario.ultimoAcesso}
+                  {usuario.email}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
