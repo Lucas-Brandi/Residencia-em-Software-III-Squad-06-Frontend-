@@ -28,6 +28,9 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
                 </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Descrição
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -70,6 +73,9 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {regra.titulo}
+                </td>
+                <td className="px-6 py-4 text-sm text-muted-foreground max-w-[200px] truncate">
+                  {regra.descricao ?? '—'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                   {regra.id}

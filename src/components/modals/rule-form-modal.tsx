@@ -35,6 +35,7 @@ function RuleFormContent({
 }) {
   const [formData, setFormData] = useState({
     titulo: editingRule?.titulo || '',
+    descricao: editingRule?.descricao || '',
     categoria: editingRule?.categoria || ('Segurança' as CategoriaRegra),
     gravidade: editingRule?.gravidade || ('Aviso' as Gravidade),
     status: editingRule?.status || ('Ativo' as StatusRegra),
@@ -42,23 +43,15 @@ function RuleFormContent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.titulo.trim()) {
-      return;
-    }
-
+    if (!formData.titulo.trim()) return;
     onSubmit(formData);
-    onClose();
-  };
-
-  const handleClose = () => {
     onClose();
   };
 
   return (
     <Modal
       isOpen={true}
-      onClose={handleClose}
+      onClose={onClose}
       title={editingRule ? 'Editar Regra' : 'Adicionar Nova Regra'}
       description={
         editingRule
@@ -67,7 +60,7 @@ function RuleFormContent({
       }
       footer={
         <>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
           <Button onClick={handleSubmit}>
@@ -92,6 +85,25 @@ function RuleFormContent({
             }
             placeholder="Digite o título da regra"
             required
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="descricao"
+            className="block text-sm font-medium text-foreground mb-1"
+          >
+            Descrição
+          </label>
+          <textarea
+            id="descricao"
+            value={formData.descricao}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, descricao: e.target.value }))
+            }
+            placeholder="Descreva o objetivo desta regra"
+            rows={3}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring resize-none"
           />
         </div>
 

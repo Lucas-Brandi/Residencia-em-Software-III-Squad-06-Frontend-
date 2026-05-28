@@ -15,6 +15,7 @@ import {
   Settings,
   UserCircle,
   X,
+  GitBranch,
 } from 'lucide-react';
 
 interface AppSidebarProps {
@@ -38,6 +39,7 @@ export function AppSidebar({ activePath = '/dashboard' }: AppSidebarProps) {
     { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
     { title: 'Regras', href: '/regras', icon: ListChecks },
+    { title: 'Repositórios', href: '/repositorios', icon: GitBranch },
     ...(currentUserRole === 'ADMIN'
       ? [{ title: 'Administração', href: '/admin', icon: Settings }]
       : []),
