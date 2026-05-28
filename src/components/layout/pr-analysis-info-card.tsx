@@ -10,8 +10,9 @@ interface PRAnalysisInfoCardProps {
 export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
   return (
     <div className="rounded-xl border border-border overflow-hidden">
+      {/* Grid: 2 cols em mobile, 4 cols em md+ */}
       <div
-        className="grid grid-cols-4 divide-x divide-border"
+        className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-border"
         style={{ backgroundColor: '#39505B' }}
       >
         <InfoCell label="Repositório">
@@ -32,18 +33,20 @@ export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
         </InfoCell>
 
         <InfoCell label="Enviado em">
-          <Calendar size={15} className="text-muted-foreground" />
-          {new Date(pr.openedAt).toLocaleDateString('pt-BR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
+          <Calendar size={15} className="text-muted-foreground shrink-0" />
+          <span className="truncate">
+            {new Date(pr.openedAt).toLocaleDateString('pt-BR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </span>
         </InfoCell>
 
         <InfoCell label="Score">
           {analysis ? (
             <div
-              className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold"
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold"
               style={{
                 backgroundColor: '#1a3d2b',
                 color: '#4ade80',
@@ -59,7 +62,7 @@ export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
         </InfoCell>
       </div>
 
-      <div className="p-5" style={{ backgroundColor: '#1A2731' }}>
+      <div className="p-4 md:p-5" style={{ backgroundColor: '#1A2731' }}>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {analysis?.iaFeedback ?? 'Nenhuma análise disponível para este PR.'}
         </p>
@@ -76,9 +79,9 @@ function InfoCell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 p-5">
+    <div className="flex flex-col items-center justify-center gap-1 p-4 md:p-5">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <div className="flex items-center gap-2 text-sm text-foreground font-medium">
+      <div className="flex items-center gap-2 text-sm text-foreground font-medium max-w-full">
         {children}
       </div>
     </div>

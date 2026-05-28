@@ -105,17 +105,19 @@ export default function PRAnalysis() {
     <SidebarProvider>
       <AppSidebar activePath="" />
       <SidebarInset>
-        <main className="min-h-screen p-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger />
-              <h1 className="text-2xl font-bold text-foreground">
-                Análise de Pull Requests: PR #{pr.prNumber} - {pr.title}
+        <main className="min-h-screen p-4 md:p-8 space-y-6">
+          {/* Header — empilha em mobile, lado a lado em md+ */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <SidebarTrigger className="shrink-0" />
+              <h1 className="text-lg md:text-2xl font-bold text-foreground leading-tight truncate">
+                Análise de PR: #{pr.prNumber} — {pr.title}
               </h1>
             </div>
 
+            {/* Ações de revisão */}
             {analysis && currentStatus === 'pendente' && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <Button
                   onClick={() => handleReview('rejeitado')}
                   disabled={reviewing}
@@ -137,12 +139,12 @@ export default function PRAnalysis() {
             )}
 
             {currentStatus === 'aprovado' && (
-              <span className="text-sm font-medium text-green-400">
+              <span className="text-sm font-medium text-green-400 shrink-0">
                 ✓ PR Aprovado
               </span>
             )}
             {currentStatus === 'rejeitado' && (
-              <span className="text-sm font-medium text-red-400">
+              <span className="text-sm font-medium text-red-400 shrink-0">
                 ✗ PR Reprovado
               </span>
             )}
@@ -150,7 +152,8 @@ export default function PRAnalysis() {
 
           <PRAnalysisInfoCard pr={pr} analysis={analysis} />
 
-          <div className="grid grid-cols-[1fr_280px] gap-6 items-start">
+          {/* Layout principal — coluna única em mobile, two-col em lg+ */}
+          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1fr_280px] lg:items-start">
             <FindingsFilter findings={findings} />
             <PRTimeline
               events={timeline}
