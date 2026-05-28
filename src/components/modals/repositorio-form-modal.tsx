@@ -1,41 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Repository, CreateRepositoryDto } from '@/types/repository';
+import { teamsService } from '@/services/teams';
+import type { Team } from '@/types/team';
 
+// ... mesmas props, remove teamId daqui
 interface RepositorioFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (dto: CreateRepositoryDto) => void;
   editingRepositorio?: Repository;
-  teamId: string;
 }
 
 function RepositorioFormContent({
   editingRepositorio,
   onSubmit,
   onClose,
-  teamId,
 }: {
   editingRepositorio?: Repository;
   onSubmit: (dto: CreateRepositoryDto) => void;
   onClose: () => void;
-  teamId: string;
 }) {
+  const [teams, setTeams] = useState<Team[]>([]);
   const [formData, setFormData] = useState({
     name: editingRepositorio?.name ?? '',
     githubId: editingRepositorio?.githubId ?? ('' as number | ''),
     githubUrl: editingRepositorio?.githubUrl ?? '',
+    teamId: editingRepositorio?.teamId ?? '',
   });
+
+  useEffect(() => {
+    teamsService.getAll().then(setTeams).catch(console.error);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || formData.githubId === '') return;
+    if (!formData.name.trim() || formData.githubId === '' || !formData.teamId)
+      return;
     onSubmit({
       name: formData.name.trim(),
       githubId: Number(formData.githubId),
-      teamId,
+      teamId: formData.teamId,
       githubUrl: formData.githubUrl.trim() || undefined,
     });
     onClose();
@@ -107,6 +114,31 @@ function RepositorioFormContent({
 
         <div>
           <label
+            htmlFor="teamId"
+            className="block text-sm font-medium text-foreground mb-1"
+          >
+            Time
+          </label>
+          <select
+            id="teamId"
+            value={formData.teamId}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, teamId: e.target.value }))
+            }
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+            required
+          >
+            <option value="">Selecione um time</option>
+            {teams.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
             htmlFor="githubUrl"
             className="block text-sm font-medium text-foreground mb-1"
           >
@@ -134,7 +166,6 @@ export function RepositorioFormModal({
   onClose,
   onSubmit,
   editingRepositorio,
-  teamId,
 }: RepositorioFormModalProps) {
   if (!isOpen) return null;
 
@@ -144,7 +175,6 @@ export function RepositorioFormModal({
       editingRepositorio={editingRepositorio}
       onSubmit={onSubmit}
       onClose={onClose}
-      teamId={teamId}
     />
   );
 }

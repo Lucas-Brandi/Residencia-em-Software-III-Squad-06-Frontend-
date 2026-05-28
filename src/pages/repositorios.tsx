@@ -10,19 +10,8 @@ import { RepositorioSearchBar } from '@/components/layout/repositorio-search-bar
 import { useRepositorios } from '@/hooks/use-repositorios';
 import type { Repository, CreateRepositoryDto } from '@/types/repository';
 
-function getCurrentTeamId(): string {
-  try {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw).teamId : '';
-  } catch {
-    return '';
-  }
-}
-
 export function Repositorios() {
   const { repositorios, loading, create, update, remove } = useRepositorios();
-
-  const teamId = getCurrentTeamId();
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -100,7 +89,6 @@ export function Repositorios() {
         onSubmit={(dto: CreateRepositoryDto) =>
           create(dto).then(() => setIsCreateOpen(false))
         }
-        teamId={teamId}
       />
 
       <RepositorioFormModal
@@ -117,7 +105,6 @@ export function Repositorios() {
           })
         }
         editingRepositorio={editingRepositorio}
-        teamId={teamId}
       />
 
       <ConfirmDeleteModal
