@@ -6,6 +6,7 @@ const REPOSITORY_ID = '2a446e40-8422-4471-91fd-7d0f9faa59a9';
 
 interface RuleFormData {
   titulo: string;
+  descricao: string;
   categoria: string;
   gravidade: string;
   status: string | boolean;
@@ -41,6 +42,7 @@ function parseSeverityToFrontend(severity?: string): string {
 function toRegra(item: {
   id: string;
   content?: string;
+  description?: string;
   ruleType?: string;
   severity?: string;
   isActive?: boolean;
@@ -48,6 +50,7 @@ function toRegra(item: {
   return {
     id: item.id,
     titulo: item.content ?? 'Sem título',
+    descricao: item.description ?? '',
     categoria: item.ruleType ?? 'Estilo',
     gravidade: parseSeverityToFrontend(item.severity),
     status: item.isActive !== false ? 'Ativo' : 'Inativo',
@@ -59,6 +62,7 @@ function buildDto(rule: RuleFormData) {
     repositoryId: REPOSITORY_ID,
     ruleType: rule.categoria,
     content: rule.titulo,
+    description: rule.descricao,
     severity: parseSeverityToBackend(rule.gravidade),
     isActive: rule.status === 'Ativo' || rule.status === true,
     createdById: getCurrentUserId(),
