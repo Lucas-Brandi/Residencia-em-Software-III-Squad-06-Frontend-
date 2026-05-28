@@ -58,10 +58,6 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
                   {regra.titulo}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                <td className="px-6 py-4 text-sm text-muted-foreground max-w-[200px] truncate">
-                  {regra.descricao ?? '—'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                   {regra.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
