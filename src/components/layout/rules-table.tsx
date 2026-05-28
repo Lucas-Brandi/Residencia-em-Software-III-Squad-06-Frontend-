@@ -11,6 +11,18 @@ interface RulesTableProps {
   onDelete?: (regraId: string) => void;
 }
 
+function SortableHeader({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-1">
+      {label}
+      <div className="flex flex-col">
+        <ChevronUp className="h-3 w-3 text-muted-foreground" />
+        <ChevronDown className="h-3 w-3 text-muted-foreground" />
+      </div>
+    </div>
+  );
+}
+
 export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
   return (
     <Card>
@@ -18,51 +30,22 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <div className="flex items-center gap-1">
-                  Título
-                  <div className="flex flex-col">
-                    <ChevronUp className="h-3 w-3 text-muted-foreground" />
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Descrição
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <div className="flex items-center gap-1">
-                  Categoria
-                  <div className="flex flex-col">
-                    <ChevronUp className="h-3 w-3 text-muted-foreground" />
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <div className="flex items-center gap-1">
-                  Gravidade
-                  <div className="flex flex-col">
-                    <ChevronUp className="h-3 w-3 text-muted-foreground" />
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                <div className="flex items-center gap-1">
-                  Status
-                  <div className="flex flex-col">
-                    <ChevronUp className="h-3 w-3 text-muted-foreground" />
-                    <ChevronDown className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                </div>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Ações
-              </th>
+              {[
+                { label: 'Título', sortable: true },
+                { label: 'ID', sortable: false },
+                { label: 'Repositório', sortable: false },
+                { label: 'Categoria', sortable: true },
+                { label: 'Gravidade', sortable: true },
+                { label: 'Status', sortable: true },
+                { label: 'Ações', sortable: false },
+              ].map(({ label, sortable }) => (
+                <th
+                  key={label}
+                  className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  {sortable ? <SortableHeader label={label} /> : label}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -71,14 +54,18 @@ export function RulesTable({ regras, onEdit, onDelete }: RulesTableProps) {
                 key={regra.id}
                 className="hover:bg-muted/50 transition-colors"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                   {regra.titulo}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                 <td className="px-6 py-4 text-sm text-muted-foreground max-w-[200px] truncate">
                   {regra.descricao ?? '—'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                   {regra.id}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {regra.repositorio ?? '—'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                   {regra.categoria}
