@@ -1,13 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Regra, CategoriaRegra, Gravidade, StatusRegra } from '@/types/rules';
+import type {
+  Regra,
+  CategoriaRegra,
+  Gravidade,
+  StatusRegra,
+} from '@/types/rules';
+import { http } from '@/services/http';
+import type { Repository } from '@/types/repository';
+
+export interface RuleFormData extends Omit<Regra, 'id'> {
+  repositoryIds: string[];
+}
 
 interface RuleFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (regra: Omit<Regra, 'id'>) => void;
+  onSubmit: (data: RuleFormData) => void;
   editingRule?: Regra;
 }
 
@@ -20,9 +31,10 @@ const categorias: CategoriaRegra[] = [
   'Arquitetura',
   'Frontend',
 ];
-
 const gravidades: Gravidade[] = ['Crítico', 'Aviso', 'Dica'];
 const statusOptions: StatusRegra[] = ['Ativo', 'Inativo'];
+const selectClass =
+  'w-full h-8 px-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring';
 
 function RuleFormContent({
   editingRule,
@@ -30,16 +42,33 @@ function RuleFormContent({
   onClose,
 }: {
   editingRule?: Regra;
-  onSubmit: (regra: Omit<Regra, 'id'>) => void;
+  onSubmit: (data: RuleFormData) => void;
   onClose: () => void;
 }) {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [formData, setFormData] = useState({
     titulo: editingRule?.titulo || '',
     descricao: editingRule?.descricao || '',
     categoria: editingRule?.categoria || ('Segurança' as CategoriaRegra),
     gravidade: editingRule?.gravidade || ('Aviso' as Gravidade),
     status: editingRule?.status || ('Ativo' as StatusRegra),
+    repositoryIds: [] as string[],
   });
+
+  useEffect(() => {
+    http<Repository[]>('/repositories')
+      .then(setRepositories)
+      .catch(console.error);
+  }, []);
+
+  const toggleRepo = (id: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      repositoryIds: prev.repositoryIds.includes(id)
+        ? prev.repositoryIds.filter((r) => r !== id)
+        : [...prev.repositoryIds, id],
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +84,7 @@ function RuleFormContent({
       title={editingRule ? 'Editar Regra' : 'Adicionar Nova Regra'}
       description={
         editingRule
-          ? 'Edite as informações da regra existente.'
+          ? 'Edite as informações da regra.'
           : 'Preencha os dados para criar uma nova regra.'
       }
       footer={
@@ -81,7 +110,7 @@ function RuleFormContent({
             id="titulo"
             value={formData.titulo}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, titulo: e.target.value }))
+              setFormData((p) => ({ ...p, titulo: e.target.value }))
             }
             placeholder="Digite o título da regra"
             required
@@ -99,7 +128,7 @@ function RuleFormContent({
             id="descricao"
             value={formData.descricao}
             onChange={(e) =>
-              setFormData((prev) => ({ ...prev, descricao: e.target.value }))
+              setFormData((p) => ({ ...p, descricao: e.target.value }))
             }
             placeholder="Descreva o objetivo desta regra"
             rows={3}
@@ -118,16 +147,16 @@ function RuleFormContent({
             id="categoria"
             value={formData.categoria}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
+              setFormData((p) => ({
+                ...p,
                 categoria: e.target.value as CategoriaRegra,
               }))
             }
-            className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
+            className={selectClass}
           >
-            {categorias.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+            {categorias.map((c) => (
+              <option key={c} value={c}>
+                {c}
               </option>
             ))}
           </select>
@@ -144,16 +173,16 @@ function RuleFormContent({
             id="gravidade"
             value={formData.gravidade}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
+              setFormData((p) => ({
+                ...p,
                 gravidade: e.target.value as Gravidade,
               }))
             }
-            className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
+            className={selectClass}
           >
-            {gravidades.map((grav) => (
-              <option key={grav} value={grav}>
-                {grav}
+            {gravidades.map((g) => (
+              <option key={g} value={g}>
+                {g}
               </option>
             ))}
           </select>
@@ -170,19 +199,50 @@ function RuleFormContent({
             id="status"
             value={formData.status}
             onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
+              setFormData((p) => ({
+                ...p,
                 status: e.target.value as StatusRegra,
               }))
             }
-            className="w-full h-8 px-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
+            className={selectClass}
           >
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
+            {statusOptions.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">
+            Repositórios{' '}
+            <span className="text-muted-foreground font-normal">
+              (opcional)
+            </span>
+          </label>
+          {repositories.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Carregando repositórios...
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2 max-h-40 overflow-y-auto border border-border rounded-lg p-2">
+              {repositories.map((repo) => (
+                <label
+                  key={repo.id}
+                  className="flex items-center gap-2 text-sm cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.repositoryIds.includes(repo.id)}
+                    onChange={() => toggleRepo(repo.id)}
+                    className="rounded border-border"
+                  />
+                  {repo.name}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       </form>
     </Modal>
@@ -196,7 +256,6 @@ export function RuleFormModal({
   editingRule,
 }: RuleFormModalProps) {
   if (!isOpen) return null;
-
   return (
     <RuleFormContent
       key={editingRule?.id || 'new'}

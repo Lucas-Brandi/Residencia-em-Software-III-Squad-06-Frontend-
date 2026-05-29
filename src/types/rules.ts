@@ -16,4 +16,5 @@ export interface Regra {
   categoria: CategoriaRegra;
   gravidade: Gravidade;
   status: StatusRegra;
+  repositorio?: string;
 }

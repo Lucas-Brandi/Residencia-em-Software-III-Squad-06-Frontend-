@@ -3,7 +3,10 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { RulesTable } from '@/components/layout/rules-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
-import { RuleFormModal } from '@/components/modals/rule-form-modal';
+import {
+  RuleFormModal,
+  type RuleFormData,
+} from '@/components/modals/rule-form-modal';
 import { ConfirmDeleteModal } from '@/components/modals/confirm-delete-modal';
 import { RegraHeader } from '@/components/layout/regra-header';
 import { RegraSearchBar } from '@/components/layout/regra-search-bar';
@@ -84,7 +87,9 @@ export function Regras() {
       <RuleFormModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSubmit={(r) => create(r).then(() => setIsCreateOpen(false))}
+        onSubmit={(r: RuleFormData) =>
+          create(r).then(() => setIsCreateOpen(false))
+        }
       />
 
       <RuleFormModal
@@ -93,7 +98,7 @@ export function Regras() {
           setIsEditOpen(false);
           setEditingRule(undefined);
         }}
-        onSubmit={(r) =>
+        onSubmit={(r: RuleFormData) =>
           editingRule &&
           update(editingRule.id, r).then(() => {
             setIsEditOpen(false);
