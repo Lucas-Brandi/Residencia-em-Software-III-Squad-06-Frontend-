@@ -55,7 +55,7 @@ export function useRegras() {
     try {
       setLoading(true);
       const data = await rulesService.getAll();
-      console.log('rules:', data); // 👈 verificar shape do retorno
+      console.log('rules:', data);
       setRegras(data.map(toRegra));
     } catch (error) {
       console.error(error);

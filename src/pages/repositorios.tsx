@@ -8,7 +8,7 @@ import { ConfirmDeleteModal } from '@/components/modals/confirm-delete-modal';
 import { RepositorioHeader } from '@/components/layout/repositorio-header';
 import { RepositorioSearchBar } from '@/components/layout/repositorio-search-bar';
 import { useRepositorios } from '@/hooks/use-repositorios';
-import type { Repository, CreateRepositoryDto } from '@/types/repository';
+import type { Repository } from '@/types/repository';
 
 export function Repositorios() {
   const { repositorios, loading, create, update, remove } = useRepositorios();
@@ -86,8 +86,8 @@ export function Repositorios() {
       <RepositorioFormModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        onSubmit={(dto: CreateRepositoryDto) =>
-          create(dto).then(() => setIsCreateOpen(false))
+        onSubmit={(dto, ruleIds) =>
+          create(dto, ruleIds).then(() => setIsCreateOpen(false))
         }
       />
 
@@ -97,9 +97,9 @@ export function Repositorios() {
           setIsEditOpen(false);
           setEditingRepositorio(undefined);
         }}
-        onSubmit={(dto: CreateRepositoryDto) =>
+        onSubmit={(dto, ruleIds) =>
           editingRepositorio &&
-          update(editingRepositorio.id, dto).then(() => {
+          update(editingRepositorio.id, dto, ruleIds).then(() => {
             setIsEditOpen(false);
             setEditingRepositorio(undefined);
           })
