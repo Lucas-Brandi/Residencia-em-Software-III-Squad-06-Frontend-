@@ -1,71 +1,49 @@
 import * as React from 'react';
-import { analysisRulesService } from '@/services/analysis-rules';
+import { rulesService } from '@/services/rules';
 import type { Regra } from '@/types/rules';
-
-const REPOSITORY_ID = '2a446e40-8422-4471-91fd-7d0f9faa59a9';
-
-interface RuleFormData {
-  titulo: string;
-  descricao: string;
-  categoria: string;
-  gravidade: string;
-  status: string | boolean;
-}
-
-function getCurrentUserId(): number {
-  try {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw).id : 1;
-  } catch {
-    return 1;
-  }
-}
+import type { RuleFormData } from '@/components/modals/rule-form-modal';
+import type { CreateRuleDto } from '@/services/rules';
 
 function parseSeverityToBackend(
-  gravidade?: string,
+  gravidade: string,
 ): 'INFO' | 'AVISO' | 'CRITICO' {
-  const n = gravidade?.toLowerCase() ?? '';
-
-  if (n.includes('dica') || n.includes('info')) return 'INFO';
-  if (n.includes('crítico') || n.includes('critico')) return 'CRITICO';
-
+  if (gravidade === 'Dica') return 'INFO';
+  if (gravidade === 'Crítico') return 'CRITICO';
   return 'AVISO';
 }
 
-function parseSeverityToFrontend(severity?: string): string {
+function parseSeverityToFrontend(severity: string): string {
   if (severity === 'CRITICO') return 'Crítico';
   if (severity === 'INFO') return 'Dica';
-
   return 'Aviso';
 }
 
 function toRegra(item: {
   id: string;
-  content?: string;
-  description?: string;
-  ruleType?: string;
-  severity?: string;
-  isActive?: boolean;
+  content: string;
+  ruleType: string;
+  severity: string;
+  isActive: boolean;
+  repositories?: { repository: { id: string; name: string } }[];
 }): Regra {
   return {
     id: item.id,
-    titulo: item.content ?? 'Sem título',
-    descricao: item.description ?? '',
-    categoria: item.ruleType ?? 'Estilo',
-    gravidade: parseSeverityToFrontend(item.severity),
-    status: item.isActive !== false ? 'Ativo' : 'Inativo',
+    titulo: item.content,
+    descricao: '',
+    categoria: item.ruleType as Regra['categoria'],
+    gravidade: parseSeverityToFrontend(item.severity) as Regra['gravidade'],
+    status: item.isActive ? 'Ativo' : 'Inativo',
+    repositorio:
+      item.repositories?.map((r) => r.repository.name).join(', ') || '—',
   };
 }
 
-function buildDto(rule: RuleFormData) {
+function toDto(r: Omit<Regra, 'id'>): CreateRuleDto {
   return {
-    repositoryId: REPOSITORY_ID,
-    ruleType: rule.categoria,
-    content: rule.titulo,
-    description: rule.descricao,
-    severity: parseSeverityToBackend(rule.gravidade),
-    isActive: rule.status === 'Ativo' || rule.status === true,
-    createdById: getCurrentUserId(),
+    ruleType: r.categoria,
+    content: r.titulo,
+    severity: parseSeverityToBackend(r.gravidade),
+    isActive: r.status === 'Ativo',
   };
 }
 
@@ -73,46 +51,58 @@ export function useRegras() {
   const [regras, setRegras] = React.useState<Regra[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  const fetchRules = async () => {
+  const fetchRules = React.useCallback(async () => {
     try {
       setLoading(true);
-
-      const data = await analysisRulesService.getAll(REPOSITORY_ID);
-
+      const data = await rulesService.getAll();
+      console.log('rules:', data);
       setRegras(data.map(toRegra));
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   React.useEffect(() => {
-    async function loadRules() {
+    const loadRules = async () => {
       try {
         setLoading(true);
-
-        const data = await analysisRulesService.getAll(REPOSITORY_ID);
-
+        const data = await rulesService.getAll();
         setRegras(data.map(toRegra));
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     void loadRules();
   }, []);
 
-  const create = (rule: RuleFormData) =>
-    analysisRulesService.create(buildDto(rule)).then(fetchRules);
+  const create = async (r: RuleFormData) => {
+    const created = await rulesService.create(toDto(r));
+    if (r.repositoryIds.length > 0) {
+      await rulesService.assign({
+        ruleId: created.id,
+        repositoryIds: r.repositoryIds,
+      });
+    }
+    await fetchRules();
+  };
 
-  const update = (id: string, rule: RuleFormData) =>
-    analysisRulesService.update(id, buildDto(rule)).then(fetchRules);
+  const update = async (id: string, r: RuleFormData) => {
+    await rulesService.update(id, toDto(r));
+    if (r.repositoryIds.length > 0) {
+      await rulesService.assign({
+        ruleId: id,
+        repositoryIds: r.repositoryIds,
+      });
+    }
+    await fetchRules();
+  };
 
-  const remove = (id: string) =>
-    analysisRulesService.delete(id).then(fetchRules);
+  const remove = (id: string) => rulesService.delete(id).then(fetchRules);
 
   return { regras, loading, create, update, remove };
 }

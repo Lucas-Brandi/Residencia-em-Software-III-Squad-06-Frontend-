@@ -5,6 +5,7 @@ import type {
   CreateRepositoryDto,
   UpdateRepositoryDto,
 } from '@/types/repository';
+import { rulesService } from '@/services/rules';
 
 function getCurrentTeamId(): string {
   try {
@@ -24,7 +25,9 @@ export function useRepositorios() {
   const refetch = React.useCallback(async () => {
     try {
       setLoading(true);
+      // use-repositorios.ts — no refetch/load:
       const data = await repositoriesService.getAll(teamId);
+      console.log('repos:', data);
       setRepositorios(data);
     } catch (error) {
       console.error(error);
@@ -49,11 +52,25 @@ export function useRepositorios() {
     void loadRepositorios();
   }, [teamId]);
 
-  const create = (dto: CreateRepositoryDto) =>
-    repositoriesService.create(dto).then(refetch);
+  const create = async (dto: CreateRepositoryDto, ruleIds: string[] = []) => {
+    const created = await repositoriesService.create(dto);
+    for (const ruleId of ruleIds) {
+      await rulesService.assign({ ruleId, repositoryIds: [created.id] });
+    }
+    await refetch();
+  };
 
-  const update = (id: string, dto: UpdateRepositoryDto) =>
-    repositoriesService.update(id, dto).then(refetch);
+  const update = async (
+    id: string,
+    dto: UpdateRepositoryDto,
+    ruleIds: string[] = [],
+  ) => {
+    await repositoriesService.update(id, dto);
+    for (const ruleId of ruleIds) {
+      await rulesService.assign({ ruleId, repositoryIds: [id] });
+    }
+    await refetch();
+  };
 
   const remove = (id: string) => repositoriesService.delete(id).then(refetch);
 
