@@ -23,6 +23,8 @@ const currentUserRole = 'admin'; // Change to 'dev' or 'reviewer' to test hiding
 const navItems = [
   { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { title: 'Pull Requests', href: '/prs', icon: GitPullRequest },
+  { title: 'Repositórios', href: '/repositories', icon: ListChecks },
+  { title: 'Equipes', href: '/teams', icon: UserCircle },
   { title: 'Regras', href: '/regras', icon: ListChecks },
   ...(currentUserRole === 'admin'
     ? [{ title: 'Administração', href: '/admin', icon: Settings }]
