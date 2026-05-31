@@ -23,13 +23,13 @@ interface RuleFormModalProps {
 }
 
 const categorias: CategoriaRegra[] = [
-  'Segurança',
-  'Lógica',
-  'Estilo',
-  'Performance',
-  'Qualidade',
-  'Arquitetura',
-  'Frontend',
+  'segurança',
+  'lógica',
+  'estilo',
+  'performance',
+  'qualidade',
+  'arquitetura',
+  'frontend',
 ];
 const gravidades: Gravidade[] = ['Crítico', 'Aviso', 'Dica'];
 const statusOptions: StatusRegra[] = ['Ativo', 'Inativo'];
@@ -49,10 +49,10 @@ function RuleFormContent({
   const [formData, setFormData] = useState({
     titulo: editingRule?.titulo || '',
     descricao: editingRule?.descricao || '',
-    categoria: editingRule?.categoria || ('Segurança' as CategoriaRegra),
+    categoria: editingRule?.categoria || ('segurança' as CategoriaRegra),
     gravidade: editingRule?.gravidade || ('Aviso' as Gravidade),
     status: editingRule?.status || ('Ativo' as StatusRegra),
-    repositoryIds: [] as string[],
+    repositoryIds: editingRule?.repositoryIds ?? [],
   });
 
   useEffect(() => {

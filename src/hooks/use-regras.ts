@@ -20,6 +20,8 @@ function parseSeverityToFrontend(severity: string): string {
 
 function toRegra(item: {
   id: string;
+  title: string;
+  description: string;
   content: string;
   ruleType: string;
   severity: string;
@@ -28,23 +30,28 @@ function toRegra(item: {
 }): Regra {
   return {
     id: item.id,
-    titulo: item.content,
-    descricao: '',
+    titulo: item.title,
+    descricao: item.description,
     categoria: item.ruleType as Regra['categoria'],
     gravidade: parseSeverityToFrontend(item.severity) as Regra['gravidade'],
     status: item.isActive ? 'Ativo' : 'Inativo',
     repositorio:
       item.repositories?.map((r) => r.repository.name).join(', ') || '—',
+    repositoryIds: item.repositories?.map((r) => r.repository.id) ?? [], // 👈
   };
 }
 
 function toDto(r: Omit<Regra, 'id'>): CreateRuleDto {
-  return {
+  const dto = {
+    title: r.titulo,
+    description: r.descricao,
+    content: r.descricao,
     ruleType: r.categoria,
-    content: r.titulo,
     severity: parseSeverityToBackend(r.gravidade),
     isActive: r.status === 'Ativo',
   };
+  console.log('dto enviado:', dto);
+  return dto;
 }
 
 export function useRegras() {
@@ -93,11 +100,17 @@ export function useRegras() {
 
   const update = async (id: string, r: RuleFormData) => {
     await rulesService.update(id, toDto(r));
-    if (r.repositoryIds.length > 0) {
-      await rulesService.assign({
-        ruleId: id,
-        repositoryIds: r.repositoryIds,
-      });
+
+    const regra = regras.find((g) => g.id === id);
+    const antigos = regra?.repositoryIds ?? [];
+    const novos = r.repositoryIds;
+    const removidos = antigos.filter((rid) => !novos.includes(rid));
+    for (const repositoryId of removidos) {
+      await rulesService.unassign(id, repositoryId);
+    }
+    const adicionados = novos.filter((rid) => !antigos.includes(rid));
+    if (adicionados.length > 0) {
+      await rulesService.assign({ ruleId: id, repositoryIds: adicionados });
     }
     await fetchRules();
   };

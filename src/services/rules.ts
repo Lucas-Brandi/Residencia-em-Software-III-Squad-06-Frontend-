@@ -10,8 +10,10 @@ export interface Rule {
 }
 
 export interface CreateRuleDto {
-  ruleType: string;
+  title: string;
+  description: string;
   content: string;
+  ruleType: string;
   severity: 'CRITICO' | 'AVISO' | 'INFO';
   isActive: boolean;
 }
