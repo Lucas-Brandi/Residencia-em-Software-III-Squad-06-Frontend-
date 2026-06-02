@@ -6,8 +6,6 @@ import {
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { StatCard } from '@/components/ui/stat-card';
-import { ApiKeyCard } from '@/components/layout/api-key-card';
-import { IaConfigCard } from '@/components/layout/ia-config-card';
 import { UsersTable } from '@/components/layout/users-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
 import { InviteUserModal } from '@/components/modals/invite-user-modal';
@@ -83,11 +81,6 @@ export function Admin() {
             {statCards.map((card, index) => (
               <StatCard key={index} {...card} />
             ))}
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            <ApiKeyCard />
-            <IaConfigCard />
           </div>
 
           {loading ? (

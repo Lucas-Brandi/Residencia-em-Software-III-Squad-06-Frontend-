@@ -1,5 +1,4 @@
 import { StatCard } from '@/types/dashboard';
-import { UsuarioAdmin } from '@/types/admin';
 import { GitPullRequest, Clock, Users, Key } from 'lucide-react';
 
 export const adminStatCards: StatCard[] = [
@@ -24,32 +23,8 @@ export const adminStatCards: StatCard[] = [
   },
   {
     title: 'Chaves API Ativas',
-    value: 2,
+    value: 1,
     change: 'Revisar em 60 dias',
     icon: Key,
-  },
-];
-
-export const mockUsuarios: UsuarioAdmin[] = [
-  {
-    id: '#01',
-    nome: 'Olivia Silva',
-    role: 'Reviewer',
-    status: 'Ativo',
-    ultimoAcesso: '15 Jan, 2026',
-  },
-  {
-    id: '#02',
-    nome: 'Admin User',
-    role: 'Admin',
-    status: 'Ativo',
-    ultimoAcesso: '14 Jan, 2026',
-  },
-  {
-    id: '#03',
-    nome: 'New Dev',
-    role: 'Dev',
-    status: 'Pendente',
-    ultimoAcesso: '21 Fev, 2026',
   },
 ];
