@@ -23,6 +23,8 @@ interface RecentPRsProps {
 export function RecentPRs({ prs }: RecentPRsProps) {
   const navigate = useNavigate();
 
+  const recentPrs = prs.slice(0, 5);
+
   return (
     <Card className="border-border" style={{ backgroundColor: '#1A2731' }}>
       <CardHeader>
@@ -31,13 +33,13 @@ export function RecentPRs({ prs }: RecentPRsProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="px-6">
-        {prs.length === 0 ? (
+        {recentPrs.length === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
             Nenhum pull request encontrado.
           </p>
         ) : (
           <ul className="divide-y divide-white/5">
-            {prs.map((pr) => (
+            {recentPrs.map((pr) => (
               <li
                 key={pr.id}
                 className="flex items-center justify-between py-4"
