@@ -45,9 +45,6 @@ export function RepositoriosTable({
                 Time
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Regras vinculadas
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Ações
               </th>
             </tr>
@@ -56,7 +53,7 @@ export function RepositoriosTable({
             {repositorios.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={4}
                   className="px-6 py-8 text-center text-sm text-muted-foreground"
                 >
                   Nenhum repositório encontrado.
@@ -86,9 +83,6 @@ export function RepositoriosTable({
                   {teamsMap[repo.teamId] ?? (
                     <span className="text-muted-foreground">—</span>
                   )}
-                </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
-                  Em breve
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
