@@ -11,10 +11,11 @@ import { PRAnalysisInfoCard } from '@/components/layout/pr-analysis-info-card';
 import { Button } from '@/components/ui/button';
 import { usePRAnalysis } from '@/hooks/use-pr-analysis';
 import { analysisResultsService } from '@/services/analysis-results';
-import { findings } from '@/mocks/pr-analysis';
 import type { AnalysisResult } from '@/types/analysis-result';
 import { pullRequestsService } from '@/services/pull-requests';
 import { Check, X } from 'lucide-react';
+
+// ✅ Removida a chamada de hook fora do componente
 
 function buildTimeline(analysis: AnalysisResult) {
   const toTime = (iso: string) =>
@@ -51,7 +52,8 @@ function PageShell({ children }: { children: React.ReactNode }) {
 }
 
 export default function PRAnalysis() {
-  const { pr, analysis, loading, error } = usePRAnalysis();
+  // ✅ Hook chamado dentro do componente, com findings incluído
+  const { pr, analysis, findings, loading, error } = usePRAnalysis();
   const [reviewing, setReviewing] = React.useState(false);
   const [reviewStatus, setReviewStatus] = React.useState<
     'aprovado' | 'rejeitado' | null
