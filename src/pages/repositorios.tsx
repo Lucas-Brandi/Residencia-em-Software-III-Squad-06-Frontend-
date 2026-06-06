@@ -5,6 +5,7 @@ import { RepositoriosTable } from '@/components/ui/repositorios-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
 import { RepositorioFormModal } from '@/components/modals/repositorio-form-modal';
 import { ConfirmDeleteModal } from '@/components/modals/confirm-delete-modal';
+import { ImportarGithubModal } from '@/components/modals/importar-github-modal';
 import { RepositorioHeader } from '@/components/layout/repositorio-header';
 import { RepositorioSearchBar } from '@/components/layout/repositorio-search-bar';
 import { useRepositorios } from '@/hooks/use-repositorios';
@@ -15,7 +16,8 @@ import type {
 } from '@/types/repository';
 
 export function Repositorios() {
-  const { repositorios, loading, create, update, remove } = useRepositorios();
+  const { repositorios, loading, create, update, remove, bulkImport } =
+    useRepositorios();
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -23,6 +25,7 @@ export function Repositorios() {
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
+  const [isImportOpen, setIsImportOpen] = React.useState(false);
   const [editingRepositorio, setEditingRepositorio] = React.useState<
     Repository | undefined
   >();
@@ -53,6 +56,7 @@ export function Repositorios() {
               setCurrentPage(1);
             }}
             onAdd={() => setIsCreateOpen(true)}
+            onImport={() => setIsImportOpen(true)}
           />
 
           {loading ? (
@@ -127,6 +131,12 @@ export function Repositorios() {
         ruleTitle={
           repositorios.find((r) => r.id === deletingRepositorioId)?.name
         }
+      />
+
+      <ImportarGithubModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImport={bulkImport}
       />
     </SidebarProvider>
   );

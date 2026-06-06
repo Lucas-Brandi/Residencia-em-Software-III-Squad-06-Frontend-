@@ -5,6 +5,7 @@ import type {
   CreateRepositoryDto,
   UpdateRepositoryDto,
 } from '@/types/repository';
+import type { BulkCreateResult } from '@/services/repositories';
 
 export function useRepositorios() {
   const [repositorios, setRepositorios] = React.useState<Repository[]>([]);
@@ -50,5 +51,13 @@ export function useRepositorios() {
 
   const remove = (id: string) => repositoriesService.delete(id).then(refetch);
 
-  return { repositorios, loading, create, update, remove };
+  const bulkImport = async (
+    repositories: CreateRepositoryDto[],
+  ): Promise<BulkCreateResult> => {
+    const result = await repositoriesService.bulkCreate({ repositories });
+    await refetch();
+    return result;
+  };
+
+  return { repositorios, loading, create, update, remove, bulkImport };
 }
