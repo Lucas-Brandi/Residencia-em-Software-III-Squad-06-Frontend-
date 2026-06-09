@@ -1,4 +1,5 @@
-import { Github, Calendar, Gauge } from 'lucide-react';
+import { Github, Calendar, Gauge, User } from 'lucide-react';
+import { useState } from 'react';
 import type { PullRequest } from '@/types/pull-request';
 import type { AnalysisResult } from '@/types/analysis-result';
 
@@ -10,7 +11,6 @@ interface PRAnalysisInfoCardProps {
 export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
   return (
     <div className="rounded-xl border border-border overflow-hidden">
-      {/* Grid: 2 cols em mobile, 4 cols em md+ */}
       <div
         className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-border"
         style={{ backgroundColor: '#39505B' }}
@@ -21,13 +21,12 @@ export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
         </InfoCell>
 
         <InfoCell label="Autor do PR">
-          <img
-            src={pr.author?.avatarUrl ?? ''}
-            alt={pr.author?.username}
-            className="w-6 h-6 rounded-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+          <AuthorAvatar
+            avatarUrl={
+              pr.author?.avatarUrl ??
+              `https://github.com/${pr.author?.githubUsername}.png`
+            }
+            username={pr.author?.username}
           />
           {pr.author?.username ?? '—'}
         </InfoCell>
@@ -68,6 +67,36 @@ export function PRAnalysisInfoCard({ pr, analysis }: PRAnalysisInfoCardProps) {
         </p>
       </div>
     </div>
+  );
+}
+
+function AuthorAvatar({
+  avatarUrl,
+  username,
+}: {
+  avatarUrl?: string | null;
+  username?: string | null;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  if (!avatarUrl || failed) {
+    const initial = username?.[0]?.toUpperCase();
+    return initial ? (
+      <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground shrink-0">
+        {initial}
+      </span>
+    ) : (
+      <User size={15} className="text-muted-foreground shrink-0" />
+    );
+  }
+
+  return (
+    <img
+      src={avatarUrl}
+      alt={username ?? 'autor'}
+      className="w-6 h-6 rounded-full object-cover shrink-0"
+      onError={() => setFailed(true)}
+    />
   );
 }
 
