@@ -5,14 +5,12 @@ interface RepositorioSearchBarProps {
   value: string;
   onChange: (v: string) => void;
   onAdd: () => void;
-  onImport: () => void;
 }
 
 export function RepositorioSearchBar({
   value,
   onChange,
   onAdd,
-  onImport,
 }: RepositorioSearchBarProps) {
   return (
     <div className="flex items-center justify-between">
@@ -23,9 +21,6 @@ export function RepositorioSearchBar({
         onChange={(e) => onChange(e.target.value)}
       />
       <div className="flex items-center gap-2">
-        <Button variant="outline" onClick={onImport}>
-          Importar todos do GitHub
-        </Button>
         <Button onClick={onAdd}>+ Adicionar Repositório</Button>
       </div>
     </div>
